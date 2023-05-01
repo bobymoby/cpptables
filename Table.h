@@ -12,6 +12,8 @@ private:
     void copyFrom(const Table& other);
     void free();
 
+    void addEntry(std::string& entry, size_t colIndex, size_t rowIndex, size_t lineCount);
+
     void readUnsafe(std::ifstream& in);
 public:
     Table();

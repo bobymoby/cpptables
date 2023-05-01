@@ -21,31 +21,47 @@ void Table::free()
     }
 }
 
+void Table::addEntry(std::string& entry, size_t colIndex, size_t rowIndex, size_t lineCount)
+{
+    Utils::strip(entry, ' ');
+    while (colIndex >= cols.size())
+    {
+        cols.push_back(new TableCol(lineCount));
+    }
+    cols[colIndex]->setCell(rowIndex, TableEntryFactory::createEntry(entry));
+}
+
 void Table::readUnsafe(std::ifstream& in)
 {
     size_t lineCount = Utils::GetLineCount(in);
     std::string line;
     size_t rowIndex = 0;
+    size_t startIndex = 0;
+    size_t endIndex = 0;
     while (std::getline(in, line))
     {
-        std::istringstream iss(line);
-        std::string cellStr;
+        startIndex = 0;
+        endIndex = 0;
         size_t colIndex = 0;
-        while (std::getline(iss, cellStr, ','))
+        bool isString = false;
+        while (endIndex < line.size())
         {
-            Utils::strip(cellStr, ' ');
-            if (rowIndex == 0)
+            if (line[endIndex] == '"')
             {
-                cols.push_back(new TableCol(lineCount));
+                isString = !isString;
             }
-            cols[colIndex]->setCell(rowIndex, TableEntryFactory::createEntry(cellStr));
-            colIndex++;
+            else if (line[endIndex] == ',' && !isString)
+            {
+                std::string cell = line.substr(startIndex, endIndex - startIndex);
+                addEntry(cell, colIndex, rowIndex, lineCount);
+                startIndex = endIndex + 1;
+                colIndex++;
+            }
+            endIndex++;
         }
+        std::string cell = line.substr(startIndex, endIndex - startIndex);
+        addEntry(cell, colIndex, rowIndex, lineCount);
         rowIndex++;
-        if (line.back() == ',')
-        {
-            cols.push_back(new TableCol(lineCount));
-        }
     }
 }
 
@@ -126,18 +142,11 @@ void Table::read(std::ifstream& in)
 
 void Table::print() const
 {
-    std::cout << "|";
+    std::cout << '+';
     for (size_t j = 0; j < cols.size(); j++)
     {
         std::cout << std::string(cols[j]->getOutputWidth() + 2, '-');
-        if (j != cols.size() - 1)
-        {
-            std::cout << "+";
-        }
-        else
-        {
-            std::cout << "|";
-        }
+        std::cout << '+';
     }
     std::cout << std::endl;
     for (size_t i = 0; i < cols[0]->getCells().size(); i++)
@@ -150,18 +159,11 @@ void Table::print() const
             std::cout << "| ";
         }
         std::cout << std::endl;
-        std::cout << "|";
+        std::cout << '+';
         for (size_t j = 0; j < cols.size(); j++)
         {
             std::cout << std::string(cols[j]->getOutputWidth() + 2, '-');
-            if (j != cols.size() - 1)
-            {
-                std::cout << "+";
-            }
-            else
-            {
-                std::cout << "|";
-            }
+            std::cout << '+';
         }
         std::cout << std::endl;
     }
@@ -169,18 +171,11 @@ void Table::print() const
 
 void Table::printNumberValues() const
 {
-    std::cout << "|";
+    std::cout << '+';
     for (size_t j = 0; j < cols.size(); j++)
     {
-        std::cout << std::string(cols[j]->getOutputWidth() + 2, '-');
-        if (j != cols.size() - 1)
-        {
-            std::cout << "+";
-        }
-        else
-        {
-            std::cout << "|";
-        }
+        std::cout << std::string(cols[j]->getNumberWidth() + 2, '-');
+        std::cout << '+';
     }
     std::cout << std::endl;
     for (size_t i = 0; i < cols[0]->getCells().size(); i++)
@@ -188,24 +183,17 @@ void Table::printNumberValues() const
         std::cout << "| ";
         for (const TableCol* col : cols)
         {
-            double output = col->getCells()[i]->getNumberValue();
-            std::cout << output;
-            // std::cout << output << std::string(col->getOutputWidth() - Utils::NumberLength(output) + 1, ' ');
+            TableEntry* entry = col->getCells()[i];
+            double output = entry->getNumberValue();
+            std::cout << output << std::string(col->getNumberWidth() - entry->getNumberWidth() + 1, ' ');
             std::cout << "| ";
         }
         std::cout << std::endl;
-        std::cout << "|";
+        std::cout << '+';
         for (size_t j = 0; j < cols.size(); j++)
         {
-            std::cout << std::string(cols[j]->getOutputWidth() + 2, '-');
-            if (j != cols.size() - 1)
-            {
-                std::cout << "+";
-            }
-            else
-            {
-                std::cout << "|";
-            }
+            std::cout << std::string(cols[j]->getNumberWidth() + 2, '-');
+            std::cout << '+';
         }
         std::cout << std::endl;
     }

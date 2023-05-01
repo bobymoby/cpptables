@@ -26,6 +26,11 @@ double TableEntry::getNumberValue() const
     return 0;
 }
 
+unsigned int TableEntry::getNumberWidth() const
+{
+    return 1;
+}
+
 StringEntry::StringEntry(const std::string& inputValue): TableEntry(EntryType::STRING, inputValue)
 {
     outputWidth = inputValue.size();
@@ -41,6 +46,11 @@ double IntegerEntry::getNumberValue() const
     return std::stod(inputValue);
 }
 
+unsigned int IntegerEntry::getNumberWidth() const
+{
+    return inputValue.size();
+}
+
 FloatEntry::FloatEntry(const std::string& inputValue): TableEntry(EntryType::FLOAT, inputValue)
 {
     outputWidth = inputValue.size();
@@ -49,6 +59,11 @@ FloatEntry::FloatEntry(const std::string& inputValue): TableEntry(EntryType::FLO
 double FloatEntry::getNumberValue() const
 {
     return std::stod(inputValue);
+}
+
+unsigned int FloatEntry::getNumberWidth() const
+{
+    return inputValue.size();
 }
 
 CommandEntry::CommandEntry(const std::string& inputValue): TableEntry(EntryType::COMMAND, inputValue)
@@ -63,6 +78,11 @@ void CommandEntry::execute(double val1, double val2)
 double CommandEntry::getNumberValue() const
 {
     return numberValue;
+}
+
+unsigned int CommandEntry::getNumberWidth() const
+{
+    return 1; //wip
 }
 
 TypeNullEntry::TypeNullEntry(const std::string& value): TableEntry(EntryType::TYPENULL, inputValue)

@@ -6,11 +6,16 @@
 void TableCol::updateWidth()
 {
     outputWidth = 0;
+    numberWidth = 0;
     for (const TableEntry* cell : cells)
     {
         if (cell->getOutputWidth() > outputWidth)
         {
             outputWidth = cell->getOutputWidth();
+        }
+        if (cell->getNumberWidth() > numberWidth)
+        {
+            numberWidth = cell->getNumberWidth();
         }
     }
 }
@@ -18,6 +23,7 @@ void TableCol::updateWidth()
 void TableCol::copyFrom(const TableCol& other)
 {
     outputWidth = other.outputWidth;
+    numberWidth = other.numberWidth;
     for (const TableEntry* cell : other.cells)
     {
         cells.push_back(new TableEntry(*cell));
@@ -80,9 +86,18 @@ void TableCol::addCell(TableEntry* cell)
     {
         outputWidth = cell->getOutputWidth();
     }
+    if (cell->getNumberWidth() > numberWidth)
+    {
+        numberWidth = cell->getNumberWidth();
+    }
 }
 
 unsigned int TableCol::getOutputWidth() const
 {
     return outputWidth;
+}
+
+unsigned int TableCol::getNumberWidth() const
+{
+    return numberWidth;
 }

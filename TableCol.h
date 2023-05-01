@@ -9,6 +9,7 @@ class TableCol
 private:
     std::vector<TableEntry*> cells;
     unsigned int outputWidth;
+    unsigned int numberWidth;
 
     void updateWidth();
 
@@ -25,4 +26,5 @@ public:
     void setCell(size_t index, TableEntry* cell);
     void addCell(TableEntry* cell);
     unsigned int getOutputWidth() const;
+    unsigned int getNumberWidth() const;
 };

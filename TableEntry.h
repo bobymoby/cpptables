@@ -17,6 +17,7 @@ protected:
     EntryType type;
     std::string inputValue;
     unsigned int outputWidth;
+    unsigned int numberWidth;
 
     TableEntry(EntryType type, const std::string& inputValue);
 
@@ -25,6 +26,7 @@ public:
     unsigned int getOutputWidth() const;
     const std::string& getInputValue() const;
     virtual double getNumberValue() const;
+    virtual unsigned int getNumberWidth() const;
 };
 
 class StringEntry: public TableEntry
@@ -38,6 +40,7 @@ class IntegerEntry: public TableEntry
 public:
     IntegerEntry(const std::string& inputValue);
     double getNumberValue() const override;
+    unsigned int getNumberWidth() const override;
 };
 
 class FloatEntry: public TableEntry
@@ -45,6 +48,7 @@ class FloatEntry: public TableEntry
 public:
     FloatEntry(const std::string& inputValue);
     double getNumberValue() const override;
+    unsigned int getNumberWidth() const override;
 };
 
 class CommandEntry: public TableEntry
@@ -55,6 +59,7 @@ private:
 public:
     CommandEntry(const std::string& inputValue);
     double getNumberValue() const override;
+    unsigned int getNumberWidth() const override;
 };
 
 class TypeNullEntry: public TableEntry
