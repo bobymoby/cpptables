@@ -52,13 +52,13 @@ void Utils::lstrip(std::string& str, char toBeRemoved)
 
 void Utils::rstrip(std::string& str, char toBeRemoved)
 {
-    size_t index = str.size() - 1;
-    while (index >= 0 && str[index] == toBeRemoved)
+    size_t index = 0;
+    while (index < str.size() && str[str.size() - index - 1] == toBeRemoved)
     {
-        index--;
+        index++;
     }
 
-    str = str.substr(0, index + 1);
+    str = str.substr(0, str.size() - index);
 }
 
 void Utils::strip(std::string& str, char toBeRemoved)
