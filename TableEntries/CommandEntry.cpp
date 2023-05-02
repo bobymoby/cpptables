@@ -40,57 +40,73 @@ unsigned int CommandEntry::getNumberWidth() const
 
 void CommandEntry::readCommand()
 {
+    std::string inputStr = inputValue.substr(1);
+
     std::string lside;
     std::string rside;
-    size_t index = 1;
-    size_t startIndex = 0;
-    size_t endIndex = 0;
-    while (index < inputValue.size() && inputValue[index] == ' ')
-    {
-        index++;
-    }
-    startIndex = index;
-    while (true)
-    {
-        if (inputValue[index] == '+')
-        {
-            op = Operation::Add;
-            endIndex = index;
-            break;
-        }
-        else if (inputValue[index] == '-')
-        {
-            op = Operation::Subtract;
-            endIndex = index;
-            break;
-        }
-        else if (inputValue[index] == '*')
-        {
-            op = Operation::Multiply;
-            endIndex = index;
-            break;
-        }
-        else if (inputValue[index] == '/')
-        {
-            op = Operation::Divide;
-            endIndex = index;
-            break;
-        }
-        else if (index == inputValue.size() - 1)
-        {
-            endIndex = index + 1;
-            break;
-        }
-        index++;
-    }
-    lside = inputValue.substr(startIndex, endIndex - startIndex);
-    rside = inputValue.substr(endIndex + 1);
 
-    std::cout << lside << " " << rside << std::endl;
-    std::cout << "op: " << (int)op << std::endl;
+    if (inputStr.find('+') != std::string::npos)
+    {
+        op = Operation::Add;
+        Utils::split(inputStr, '+', lside, rside);
+    }
+    else if (inputStr.find('-') != std::string::npos)
+    {
+        op = Operation::Subtract;
+        Utils::split(inputStr, '-', lside, rside);
+    }
+    else if (inputStr.find('*') != std::string::npos)
+    {
+        op = Operation::Multiply;
+        Utils::split(inputStr, '*', lside, rside);
+    }
+    else if (inputStr.find('/') != std::string::npos)
+    {
+        op = Operation::Divide;
+        Utils::split(inputStr, '/', lside, rside);
+    }
+    else
+    {
+        std::cout << "Invalid command: " << inputStr << std::endl;
+    }
+    Utils::strip(lside, ' ');
+    Utils::strip(rside, ' ');
 
-    readIndexes(lside, true);
-    readIndexes(rside, false);
+    if (lside[0] == 'R')
+    {
+        isLeftCell = true;
+        readIndexes(lside, true);
+    }
+    else
+    {
+        isLeftCell = false;
+        try
+        {
+            leftNumberValue = std::stod(lside);
+        }
+        catch (const std::exception&)
+        {
+            std::cout << "Invalid command argument: " << lside << std::endl;
+        }
+    }
+
+    if (rside[0] == 'R')
+    {
+        isRightCell = true;
+        readIndexes(rside, false);
+    }
+    else
+    {
+        isRightCell = false;
+        try
+        {
+            rightNumberValue = std::stod(rside);
+        }
+        catch (const std::exception&)
+        {
+            std::cout << "Invalid command argument: " << rside << std::endl;
+        }
+    }
 }
 
 size_t CommandEntry::getLCIndex() const
@@ -103,14 +119,34 @@ size_t CommandEntry::getLRIndex() const
     return leftRowIndex;
 }
 
+bool CommandEntry::getIsLeftCell() const
+{
+    return isLeftCell;
+}
+
 size_t CommandEntry::getRCIndex() const
 {
     return rightColIndex;
 }
 
+double CommandEntry::getLNumberValue() const
+{
+    return leftNumberValue;
+}
+
+bool CommandEntry::getIsRightCell() const
+{
+    return isRightCell;
+}
+
 Operation CommandEntry::getOperation() const
 {
     return op;
+}
+
+double CommandEntry::getRNumberValue() const
+{
+    return rightNumberValue;
 }
 
 size_t CommandEntry::getRRIndex() const

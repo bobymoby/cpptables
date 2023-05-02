@@ -17,9 +17,10 @@ private:
     void executeAll();
     void execute(size_t colIndex, size_t rowIndex);
 
+    void makeCellError(size_t colIndex, size_t rowIndex, const std::string& errorMsg);
+
     void readUnsafe(std::ifstream& in);
 
-    double strToCellValue(std::string& str) const;
 public:
     Table();
     Table(const std::string& filename);

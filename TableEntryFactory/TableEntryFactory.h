@@ -9,6 +9,7 @@ private:
     static bool isInteger(const std::string& inputValue);
     static bool isFloat(const std::string& inputValue);
     static bool isCommand(const std::string& inputValue);
+    static bool isFalseCommand(const std::string& inputValue);
     static bool isTypeNull(const std::string& inputValue);
 
 public:

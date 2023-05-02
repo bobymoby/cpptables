@@ -66,3 +66,19 @@ void Utils::strip(std::string& str, char toBeRemoved)
     lstrip(str, toBeRemoved);
     rstrip(str, toBeRemoved);
 }
+
+void Utils::split(const std::string& str, char delimiter, std::string& left, std::string& right)
+{
+    size_t splitIndex = str.find(delimiter);
+
+    if (splitIndex == std::string::npos)
+    {
+        left = str;
+        right = "";
+    }
+    else
+    {
+        left = str.substr(0, splitIndex);
+        right = str.substr(splitIndex + 1);
+    }
+}

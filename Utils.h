@@ -12,4 +12,5 @@ namespace Utils
     void lstrip(std::string& str, char toBeRemoved);
     void rstrip(std::string& str, char toBeRemoved);
     void strip(std::string& str, char toBeRemoved);
+    void split(const std::string& str, char delimiter, std::string& left, std::string& right);
 };

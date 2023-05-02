@@ -54,6 +54,36 @@ bool TableEntryFactory::isCommand(const std::string& value)
     return value.front() == '=';
 }
 
+bool TableEntryFactory::isFalseCommand(const std::string& inputValue)
+{
+    size_t plusCount = 0;
+    size_t minusCount = 0;
+    size_t starCount = 0;
+    size_t slashCount = 0;
+
+    for (size_t i = 1; i < inputValue.size(); i++)
+    {
+        if (inputValue[i] == '+')
+        {
+            plusCount++;
+        }
+        else if (inputValue[i] == '-')
+        {
+            minusCount++;
+        }
+        else if (inputValue[i] == '*')
+        {
+            starCount++;
+        }
+        else if (inputValue[i] == '/')
+        {
+            slashCount++;
+        }
+    }
+
+    return plusCount + minusCount + starCount + slashCount != 1;
+}
+
 bool TableEntryFactory::isTypeNull(const std::string& value)
 {
     return value.empty();
@@ -91,6 +121,10 @@ TableEntry* TableEntryFactory::createEntry(const std::string& value)
     }
     if (isCommand(value))
     {
+        if (isFalseCommand(value))
+        {
+            return new ErrorEntry(value + " has 0 or more than 1 operation signs.");
+        }
         return new CommandEntry(value);
     }
     return new ErrorEntry(value);
