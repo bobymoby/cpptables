@@ -1,4 +1,5 @@
 #include "TableCol.h"
+#include "TableEntryFactory/TableEntryFactory.h"
 #include <iostream>
 
 
@@ -45,7 +46,11 @@ TableCol::TableCol(const std::vector<TableEntry*>& cells): cells(cells)
 
 TableCol::TableCol(size_t size)
 {
-    cells.resize(size, TableEntryFactory::createEntry(""));
+    cells.resize(size);
+    for (size_t i = 0; i < size; i++)
+    {
+        cells[i] = TableEntryFactory::createEntry("");
+    }
 }
 
 TableCol::~TableCol()
@@ -75,6 +80,7 @@ const std::vector<TableEntry*>& TableCol::getCells() const
 
 void TableCol::setCell(size_t index, TableEntry* cell)
 {
+    delete cells[index];
     cells[index] = cell;
     updateWidth();
 }

@@ -1,9 +1,8 @@
 #include "Table.h"
+#include "TableEntryFactory/TableEntryFactory.h"
 #include "Utils.h"
-#include <sstream>
 #include <iostream>
-
-
+#include <iomanip>
 
 void Table::copyFrom(const Table& other)
 {
@@ -23,12 +22,95 @@ void Table::free()
 
 void Table::addEntry(std::string& entry, size_t colIndex, size_t rowIndex, size_t lineCount)
 {
-    Utils::strip(entry, ' ');
+    // Utils::strip(entry, ' ');
     while (colIndex >= cols.size())
     {
         cols.push_back(new TableCol(lineCount));
     }
     cols[colIndex]->setCell(rowIndex, TableEntryFactory::createEntry(entry));
+}
+
+void Table::executeAll()
+{
+    for (size_t colIndex = 0; colIndex < cols.size(); colIndex++)
+    {
+        for (size_t rowIndex = 0; rowIndex < cols[colIndex]->getCells().size(); rowIndex++)
+        {
+            if (cols[colIndex]->getCells()[rowIndex]->getType() == EntryType::COMMAND)
+            {
+                execute(colIndex, rowIndex);
+            }
+        }
+    }
+
+    for (TableCol* col : cols)
+    {
+        col->updateWidth();
+    }
+}
+
+void Table::execute(size_t colIndex, size_t rowIndex)
+{
+    CommandEntry* command = (CommandEntry*)(cols[colIndex]->getCells()[rowIndex]);
+
+    if (command->hasExecuted())
+    {
+        return;
+    }
+
+    double result = 0;
+    size_t lcolIndex = command->getLCIndex();
+    size_t lrowIndex = command->getLRIndex();
+    size_t rcolIndex = command->getRCIndex();
+    size_t rrowIndex = command->getRRIndex();
+
+    if (lcolIndex >= cols.size())
+    {
+        std::cout << 'R' << rowIndex + 1 << 'C' << colIndex + 1 << " :";
+        std::cout << "Invalid left column index: " << lcolIndex << std::endl;
+        return;
+    }
+    if (lrowIndex >= cols[lcolIndex]->getCells().size())
+    {
+        std::cout << 'R' << rowIndex + 1 << 'C' << colIndex + 1 << " :";
+        std::cout << "Invalid left row index: " << lrowIndex << std::endl;
+        return;
+    }
+    if (rcolIndex >= cols.size())
+    {
+        std::cout << 'R' << rowIndex + 1 << 'C' << colIndex + 1 << " :";
+        std::cout << "Invalid right column index: " << rcolIndex << std::endl;
+        return;
+    }
+    if (rrowIndex >= cols[rcolIndex]->getCells().size())
+    {
+        std::cout << 'R' << rowIndex + 1 << 'C' << colIndex + 1 << " :";
+        std::cout << "Invalid right row index: " << rrowIndex << std::endl;
+        return;
+    }
+
+    double lvalue = cols[lcolIndex]->getCells()[lrowIndex]->getNumberValue();
+    double rvalue = cols[rcolIndex]->getCells()[rrowIndex]->getNumberValue();
+
+    switch (command->getOperation())
+    {
+    case Operation::Add:
+        result = lvalue + rvalue;
+        break;
+    case Operation::Subtract:
+        result = lvalue - rvalue;
+        break;
+    case Operation::Multiply:
+        result = lvalue * rvalue;
+        break;
+    case Operation::Divide:
+        result = lvalue / rvalue;
+        break;
+    default:
+        break;
+    }
+
+    command->execute(result);
 }
 
 void Table::readUnsafe(std::ifstream& in)
@@ -80,6 +162,8 @@ Table::Table(const std::string& filename)
 
     readUnsafe(file);
 
+    executeAll();
+
     file.close();
 }
 
@@ -91,6 +175,7 @@ Table::Table(std::ifstream& in)
     }
 
     readUnsafe(in);
+    executeAll();
 }
 
 Table::Table(const Table& other)
@@ -124,6 +209,7 @@ void Table::read(const std::string& filename)
     free();
 
     readUnsafe(file);
+    executeAll();
 
     file.close();
 }
@@ -138,6 +224,7 @@ void Table::read(std::ifstream& in)
     free();
 
     readUnsafe(in);
+    executeAll();
 }
 
 void Table::print() const
@@ -171,6 +258,7 @@ void Table::print() const
 
 void Table::printNumberValues() const
 {
+    std::cout << std::setprecision(2) << std::fixed;
     std::cout << '+';
     for (size_t j = 0; j < cols.size(); j++)
     {

@@ -2,7 +2,8 @@
 
 #include <vector>
 
-#include "TableEntry.h"
+#include "TableEntries/TableEntry.h"
+#include "TableEntries/CommandEntry.h"
 
 class TableCol
 {
@@ -11,7 +12,6 @@ private:
     unsigned int outputWidth;
     unsigned int numberWidth;
 
-    void updateWidth();
 
     void copyFrom(const TableCol& other);
     void free();
@@ -27,4 +27,5 @@ public:
     void addCell(TableEntry* cell);
     unsigned int getOutputWidth() const;
     unsigned int getNumberWidth() const;
+    void updateWidth();
 };

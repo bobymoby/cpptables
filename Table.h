@@ -14,7 +14,12 @@ private:
 
     void addEntry(std::string& entry, size_t colIndex, size_t rowIndex, size_t lineCount);
 
+    void executeAll();
+    void execute(size_t colIndex, size_t rowIndex);
+
     void readUnsafe(std::ifstream& in);
+
+    double strToCellValue(std::string& str) const;
 public:
     Table();
     Table(const std::string& filename);
