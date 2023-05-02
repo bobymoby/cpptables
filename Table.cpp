@@ -128,7 +128,7 @@ void Table::readUnsafe(std::ifstream& in)
         bool isString = false;
         while (endIndex < line.size())
         {
-            if (line[endIndex] == '"')
+            if (line[endIndex] == '"' && (endIndex == 0 || line[endIndex - 1] != '\\'))
             {
                 isString = !isString;
             }

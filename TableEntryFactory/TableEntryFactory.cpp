@@ -6,6 +6,8 @@
 #include "../TableEntries/TypeNullEntry.h"
 #include "../TableEntries/ErrorEntry.h"
 
+#include <iostream>
+
 
 bool TableEntryFactory::isString(const std::string& value)
 {
@@ -65,7 +67,19 @@ TableEntry* TableEntryFactory::createEntry(const std::string& value)
     }
     if (isString(value))
     {
-        return new StringEntry(value.substr(1, value.size() - 2));
+        std::string stripped = value.substr(1, value.size() - 2);
+        if (stripped.size() > 1)
+        {
+            for (size_t i = 0; i < stripped.size() - 1; i++)
+            {
+                if (stripped[i] == '\\' && stripped[i + 1] == '"')
+                {
+                    stripped.erase(i, 1);
+                }
+            }
+        }
+
+        return new StringEntry(stripped);
     }
     if (isInteger(value))
     {
