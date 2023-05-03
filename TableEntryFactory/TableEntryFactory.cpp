@@ -60,28 +60,31 @@ bool TableEntryFactory::isFalseCommand(const std::string& inputValue)
     size_t minusCount = 0;
     size_t starCount = 0;
     size_t slashCount = 0;
+    size_t powCount = 0;
 
     for (size_t i = 1; i < inputValue.size(); i++)
     {
-        if (inputValue[i] == '+')
+        switch (inputValue[i])
         {
+        case '+':
             plusCount++;
-        }
-        else if (inputValue[i] == '-')
-        {
+            break;
+        case '-':
             minusCount++;
-        }
-        else if (inputValue[i] == '*')
-        {
+            break;
+        case '*':
             starCount++;
-        }
-        else if (inputValue[i] == '/')
-        {
+            break;
+        case '/':
             slashCount++;
+            break;
+        case '^':
+            powCount++;
+            break;
         }
     }
 
-    return plusCount + minusCount + starCount + slashCount != 1;
+    return plusCount + minusCount + starCount + slashCount + powCount != 1;
 }
 
 bool TableEntryFactory::isTypeNull(const std::string& value)

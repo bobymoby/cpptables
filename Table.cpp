@@ -3,6 +3,7 @@
 #include "TableEntries/ErrorEntry.h"
 #include "Utils.h"
 #include <iostream>
+#include <cmath>
 #include <iomanip>
 
 void Table::copyFrom(const Table& other)
@@ -52,13 +53,13 @@ void Table::executeAll()
 
 void Table::execute(size_t colIndex, size_t rowIndex)
 {
-    static std::vector<const TableEntry*> dependencies;
+    static std::vector<const TableEntry*> visited;
 
 
     TableEntry* currEntry = cols[colIndex]->getCells()[rowIndex];
     CommandEntry* command = dynamic_cast<CommandEntry*>(currEntry);
 
-    for (const TableEntry* entry : dependencies)
+    for (const TableEntry* entry : visited)
     {
         if (entry == currEntry)
         {
@@ -67,7 +68,7 @@ void Table::execute(size_t colIndex, size_t rowIndex)
         }
     }
 
-    dependencies.push_back(cols[colIndex]->getCells()[rowIndex]);
+    visited.push_back(cols[colIndex]->getCells()[rowIndex]);
 
     if (command->hasExecuted())
     {
@@ -89,13 +90,13 @@ void Table::execute(size_t colIndex, size_t rowIndex)
         if (lcolIndex == colIndex && lrowIndex == rowIndex)
         {
             makeCellError(colIndex, rowIndex, command->getInputValue() + " Self reference!");
-            dependencies.pop_back();
+            visited.pop_back();
             return;
         }
         if (lcolIndex >= cols.size() || lrowIndex >= cols[lcolIndex]->getCells().size())
         {
             makeCellError(colIndex, rowIndex, command->getInputValue() + " Invalid reference!");
-            dependencies.pop_back();
+            visited.pop_back();
             return;
         }
         if (cols[lcolIndex]->getCells()[lrowIndex]->getType() == EntryType::COMMAND)
@@ -116,13 +117,13 @@ void Table::execute(size_t colIndex, size_t rowIndex)
         if (rcolIndex == colIndex && rrowIndex == rowIndex)
         {
             makeCellError(colIndex, rowIndex, command->getInputValue() + " Self reference!");
-            dependencies.pop_back();
+            visited.pop_back();
             return;
         }
         if (rcolIndex >= cols.size() || rrowIndex >= cols[rcolIndex]->getCells().size())
         {
             makeCellError(colIndex, rowIndex, command->getInputValue() + " Invalid reference!");
-            dependencies.pop_back();
+            visited.pop_back();
             return;
         }
         if (cols[rcolIndex]->getCells()[rrowIndex]->getType() == EntryType::COMMAND)
@@ -139,30 +140,33 @@ void Table::execute(size_t colIndex, size_t rowIndex)
 
     switch (command->getOperation())
     {
-    case Operation::Add:
+    case Operation::ADD:
         result = lvalue + rvalue;
         break;
-    case Operation::Subtract:
+    case Operation::SUBTRACT:
         result = lvalue - rvalue;
         break;
-    case Operation::Multiply:
+    case Operation::MULTIPLY:
         result = lvalue * rvalue;
         break;
-    case Operation::Divide:
+    case Operation::DIVIDE:
         if (rvalue == 0)
         {
             makeCellError(colIndex, rowIndex, command->getInputValue() + " Division by zero!");
-            dependencies.pop_back();
+            visited.pop_back();
             return;
         }
         result = lvalue / rvalue;
+        break;
+    case Operation::POWER:
+        result = pow(lvalue, rvalue);
         break;
     default:
         break;
     }
 
     command->execute(result);
-    dependencies.pop_back();
+    visited.pop_back();
 
 }
 
@@ -205,7 +209,7 @@ void Table::readUnsafe(std::ifstream& in)
     }
 }
 
-Table::Table(): cols()
+Table::Table() : cols()
 {
 }
 

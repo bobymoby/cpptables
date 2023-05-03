@@ -4,13 +4,14 @@
 
 enum class Operation
 {
-    Add,
-    Subtract,
-    Multiply,
-    Divide
+    ADD,
+    SUBTRACT,
+    MULTIPLY,
+    DIVIDE,
+    POWER
 };
 
-class CommandEntry: public TableEntry
+class CommandEntry : public TableEntry
 {
 private:
     double numberValue;

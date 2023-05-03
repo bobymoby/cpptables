@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-CommandEntry::CommandEntry(const std::string& inputValue):
+CommandEntry::CommandEntry(const std::string& inputValue) :
     TableEntry(EntryType::COMMAND, inputValue), executed(false)
 {
     numberValue = 0;
@@ -47,23 +47,28 @@ void CommandEntry::readCommand()
 
     if (inputStr.find('+') != std::string::npos)
     {
-        op = Operation::Add;
+        op = Operation::ADD;
         Utils::split(inputStr, '+', lside, rside);
     }
     else if (inputStr.find('-') != std::string::npos)
     {
-        op = Operation::Subtract;
+        op = Operation::SUBTRACT;
         Utils::split(inputStr, '-', lside, rside);
     }
     else if (inputStr.find('*') != std::string::npos)
     {
-        op = Operation::Multiply;
+        op = Operation::MULTIPLY;
         Utils::split(inputStr, '*', lside, rside);
     }
     else if (inputStr.find('/') != std::string::npos)
     {
-        op = Operation::Divide;
+        op = Operation::DIVIDE;
         Utils::split(inputStr, '/', lside, rside);
+    }
+    else if (inputStr.find('^') != std::string::npos)
+    {
+        op = Operation::POWER;
+        Utils::split(inputStr, '^', lside, rside);
     }
     else
     {
