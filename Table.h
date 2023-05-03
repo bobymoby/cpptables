@@ -9,6 +9,8 @@ class Table
 private:
     std::vector<TableCol*> cols;
 
+    std::vector<const TableEntry*> visited; //used for detecting circular dependencies
+
     void copyFrom(const Table& other);
     void free();
 

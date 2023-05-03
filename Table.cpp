@@ -53,9 +53,6 @@ void Table::executeAll()
 
 void Table::execute(size_t colIndex, size_t rowIndex)
 {
-    static std::vector<const TableEntry*> visited;
-
-
     TableEntry* currEntry = cols[colIndex]->getCells()[rowIndex];
     CommandEntry* command = dynamic_cast<CommandEntry*>(currEntry);
 
@@ -219,21 +216,22 @@ Table::Table(const std::string& filename)
 
     if (!file.is_open())
     {
-        throw std::runtime_error("Could not open file " + filename);
+        std::cout << "Could not open file " << filename << std::endl;
+        return;
     }
 
     readUnsafe(file);
+    file.close();
 
     executeAll();
-
-    file.close();
 }
 
 Table::Table(std::ifstream& in)
 {
     if (!in.is_open())
     {
-        throw std::runtime_error("Could not open file");
+        std::cout << "Could not open file" << std::endl;
+        return;
     }
 
     readUnsafe(in);
@@ -291,6 +289,11 @@ void Table::read(std::ifstream& in)
 
 void Table::print() const
 {
+    if (cols.empty())
+    {
+        std::cout << "Empty table!" << std::endl;
+        return;
+    }
     std::cout << '+';
     for (size_t j = 0; j < cols.size(); j++)
     {
@@ -320,6 +323,11 @@ void Table::print() const
 
 void Table::printNumberValues() const
 {
+    if (cols.empty())
+    {
+        std::cout << "Empty table!" << std::endl;
+        return;
+    }
     std::cout << std::setprecision(2) << std::fixed;
     std::cout << '+';
     for (size_t j = 0; j < cols.size(); j++)

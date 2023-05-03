@@ -1,6 +1,6 @@
 #include "TypeNullEntry.h"
 
-TypeNullEntry::TypeNullEntry(const std::string& value): TableEntry(EntryType::TYPENULL, inputValue)
+TypeNullEntry::TypeNullEntry() : TableEntry(EntryType::TYPENULL, "")
 {
     outputWidth = 0;
 }

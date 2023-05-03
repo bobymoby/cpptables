@@ -2,8 +2,8 @@
 
 #include "TableEntry.h"
 
-class TypeNullEntry: public TableEntry
+class TypeNullEntry : public TableEntry
 {
 public:
-    TypeNullEntry(const std::string& inputValue);
+    TypeNullEntry();
 };

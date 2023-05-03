@@ -1,5 +1,7 @@
 #include "TableCol.h"
 #include "TableEntryFactory/TableEntryFactory.h"
+
+#include "TableEntries/TypeNullEntry.h"
 #include <iostream>
 
 
@@ -39,7 +41,7 @@ void TableCol::free()
     }
 }
 
-TableCol::TableCol(const std::vector<TableEntry*>& cells): cells(cells)
+TableCol::TableCol(const std::vector<TableEntry*>& cells) : cells(cells)
 {
     updateWidth();
 }
@@ -49,7 +51,7 @@ TableCol::TableCol(size_t size)
     cells.resize(size);
     for (size_t i = 0; i < size; i++)
     {
-        cells[i] = TableEntryFactory::createEntry("");
+        cells[i] = new TypeNullEntry();
     }
 }
 

@@ -9,17 +9,17 @@
 #include <iostream>
 
 
-bool TableEntryFactory::isString(const std::string& value)
+bool TableEntryFactory::isString(const std::string& inputValue)
 {
-    return value.front() == '"' && value.back() == '"';
+    return inputValue.front() == '"' && inputValue.back() == '"';
 }
 
-bool TableEntryFactory::isInteger(const std::string& value)
+bool TableEntryFactory::isInteger(const std::string& inputValue)
 {
-    bool hasSign = value.front() == '+' || value.front() == '-';
-    for (int i = hasSign; i < value.size(); i++)
+    bool hasSign = inputValue.front() == '+' || inputValue.front() == '-';
+    for (int i = hasSign; i < inputValue.size(); i++)
     {
-        if (!isdigit(value[i]))
+        if (!isdigit(inputValue[i]))
         {
             return false;
         }
@@ -27,13 +27,13 @@ bool TableEntryFactory::isInteger(const std::string& value)
     return true;
 }
 
-bool TableEntryFactory::isFloat(const std::string& value)
+bool TableEntryFactory::isFloat(const std::string& inputValue)
 {
-    bool hasSign = value.front() == '+' || value.front() == '-';
+    bool hasSign = inputValue.front() == '+' || inputValue.front() == '-';
     bool hasDot = false;
-    for (int i = hasSign; i < value.size(); i++)
+    for (int i = hasSign; i < inputValue.size(); i++)
     {
-        if (value[i] == '.')
+        if (inputValue[i] == '.')
         {
             if (hasDot)
             {
@@ -41,7 +41,7 @@ bool TableEntryFactory::isFloat(const std::string& value)
             }
             hasDot = true;
         }
-        else if (!isdigit(value[i]))
+        else if (!isdigit(inputValue[i]))
         {
             return false;
         }
@@ -49,9 +49,9 @@ bool TableEntryFactory::isFloat(const std::string& value)
     return true;
 }
 
-bool TableEntryFactory::isCommand(const std::string& value)
+bool TableEntryFactory::isCommand(const std::string& inputValue)
 {
-    return value.front() == '=';
+    return inputValue.front() == '=';
 }
 
 bool TableEntryFactory::isFalseCommand(const std::string& inputValue)
@@ -87,20 +87,20 @@ bool TableEntryFactory::isFalseCommand(const std::string& inputValue)
     return plusCount + minusCount + starCount + slashCount + powCount != 1;
 }
 
-bool TableEntryFactory::isTypeNull(const std::string& value)
+bool TableEntryFactory::isTypeNull(const std::string& inputValue)
 {
-    return value.empty();
+    return inputValue.empty();
 }
 
-TableEntry* TableEntryFactory::createEntry(const std::string& value)
+TableEntry* TableEntryFactory::createEntry(const std::string& inputValue)
 {
-    if (isTypeNull(value))
+    if (isTypeNull(inputValue))
     {
-        return new TypeNullEntry(value);
+        return new TypeNullEntry();
     }
-    if (isString(value))
+    if (isString(inputValue))
     {
-        std::string stripped = value.substr(1, value.size() - 2);
+        std::string stripped = inputValue.substr(1, inputValue.size() - 2);
         if (stripped.size() > 1)
         {
             for (size_t i = 0; i < stripped.size() - 1; i++)
@@ -114,21 +114,21 @@ TableEntry* TableEntryFactory::createEntry(const std::string& value)
 
         return new StringEntry(stripped);
     }
-    if (isInteger(value))
+    if (isInteger(inputValue))
     {
-        return new IntegerEntry(value);
+        return new IntegerEntry(inputValue);
     }
-    if (isFloat(value))
+    if (isFloat(inputValue))
     {
-        return new FloatEntry(value);
+        return new FloatEntry(inputValue);
     }
-    if (isCommand(value))
+    if (isCommand(inputValue))
     {
-        if (isFalseCommand(value))
+        if (isFalseCommand(inputValue))
         {
-            return new ErrorEntry(value + " has 0 or more than 1 operation signs.");
+            return new ErrorEntry(inputValue + " has 0 or more than 1 operation signs.");
         }
-        return new CommandEntry(value);
+        return new CommandEntry(inputValue);
     }
-    return new ErrorEntry(value);
+    return new ErrorEntry(inputValue);
 }
