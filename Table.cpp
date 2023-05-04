@@ -264,6 +264,8 @@ void Table::read(const std::string& filename)
 
 void Table::read(std::ifstream& in)
 {
+    this->filename = in.getloc().name();
+
     free();
 
     readInput(in);
