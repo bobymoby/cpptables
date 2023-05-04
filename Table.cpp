@@ -172,8 +172,12 @@ void Table::makeCellError(size_t colIndex, size_t rowIndex, const std::string& e
     cols[colIndex]->setCell(rowIndex, new ErrorEntry(errorMsg));
 }
 
-void Table::readUnsafe(std::ifstream& in)
+void Table::readInput(std::ifstream& in)
 {
+    if (!in.is_open())
+    {
+        throw std::runtime_error("File not open!");
+    }
     size_t lineCount = Utils::GetLineCount(in);
     std::string line;
     size_t rowIndex = 0;
@@ -212,15 +216,11 @@ Table::Table() : cols()
 
 Table::Table(const std::string& filename)
 {
+    this->filename = filename;
     std::ifstream file(filename);
 
-    if (!file.is_open())
-    {
-        std::cout << "Could not open file " << filename << std::endl;
-        return;
-    }
+    readInput(file);
 
-    readUnsafe(file);
     file.close();
 
     executeAll();
@@ -228,13 +228,8 @@ Table::Table(const std::string& filename)
 
 Table::Table(std::ifstream& in)
 {
-    if (!in.is_open())
-    {
-        std::cout << "Could not open file" << std::endl;
-        return;
-    }
-
-    readUnsafe(in);
+    this->filename = in.getloc().name();
+    readInput(in);
     executeAll();
 }
 
@@ -261,30 +256,51 @@ Table::~Table()
 void Table::read(const std::string& filename)
 {
     std::ifstream file(filename);
-    if (!file.is_open())
-    {
-        throw std::runtime_error("Could not open file " + filename);
-    }
 
-    free();
-
-    readUnsafe(file);
-    executeAll();
+    read(file);
 
     file.close();
 }
 
 void Table::read(std::ifstream& in)
 {
-    if (!in.is_open())
+    free();
+
+    readInput(in);
+    executeAll();
+}
+
+void Table::save(const std::string& filename) const
+{
+    std::ofstream file(filename);
+    save(file);
+    file.close();
+}
+
+void Table::save(std::ofstream& out) const
+{
+    if (!out.is_open())
     {
         throw std::runtime_error("Could not open file");
     }
 
-    free();
+    if (cols.empty())
+    {
+        return;
+    }
 
-    readUnsafe(in);
-    executeAll();
+    for (size_t rowIndex = 0; rowIndex < cols[0]->getCells().size(); rowIndex++)
+    {
+        for (size_t colIndex = 0; colIndex < cols.size(); colIndex++)
+        {
+            out << cols[colIndex]->getCells()[rowIndex]->getInputValue();
+            if (colIndex != cols.size() - 1)
+            {
+                out << ',';
+            }
+        }
+        out << std::endl;
+    }
 }
 
 void Table::print() const

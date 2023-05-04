@@ -8,6 +8,7 @@ class Table
 {
 private:
     std::vector<TableCol*> cols;
+    std::string filename;
 
     std::vector<const TableEntry*> visited; //used for detecting circular dependencies
 
@@ -21,7 +22,7 @@ private:
 
     void makeCellError(size_t colIndex, size_t rowIndex, const std::string& errorMsg);
 
-    void readUnsafe(std::ifstream& in);
+    void readInput(std::ifstream& in);
 
 public:
     Table();
@@ -33,6 +34,10 @@ public:
 
     void read(const std::string& filename);
     void read(std::ifstream& in);
+
+    void save();
+    void save(const std::string& filename) const;
+    void save(std::ofstream& out) const;
 
     void print() const;
     void printNumberValues() const;
