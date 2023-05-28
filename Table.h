@@ -12,10 +12,11 @@ private:
 
     std::vector<const TableEntry*> visited; //used for detecting circular dependencies
 
-    void copyFrom(const Table& other);
     void free();
+    void copyFrom(const Table& other);
+    void moveFrom(Table&& other);
 
-    void addEntry(std::string& entry, size_t colIndex, size_t rowIndex, size_t lineCount);
+    void addEntry(const std::string& entry, size_t colIndex, size_t rowIndex, size_t lineCount);
 
     void executeAll();
     void execute(size_t colIndex, size_t rowIndex);
@@ -29,7 +30,9 @@ public:
     Table(const std::string& filename);
     Table(std::ifstream& in);
     Table(const Table& other);
+    Table(Table&& other) noexcept;
     Table& operator=(const Table& other);
+    Table& operator=(Table&& other) noexcept;
     ~Table();
 
     void read(const std::string& filename);

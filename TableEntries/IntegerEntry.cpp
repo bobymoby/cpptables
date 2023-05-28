@@ -1,8 +1,7 @@
 #include "IntegerEntry.h"
 
-IntegerEntry::IntegerEntry(const std::string& inputValue): TableEntry(EntryType::INTEGER, inputValue)
+IntegerEntry::IntegerEntry(const std::string& inputValue) : TableEntry(inputValue)
 {
-    outputWidth = inputValue.size();
 }
 
 double IntegerEntry::getNumberValue() const
@@ -13,4 +12,14 @@ double IntegerEntry::getNumberValue() const
 unsigned int IntegerEntry::getNumberWidth() const
 {
     return inputValue.size();
+}
+
+EntryType IntegerEntry::getType() const
+{
+    return EntryType::INTEGER;
+}
+
+TableEntry* IntegerEntry::clone() const
+{
+    return new IntegerEntry(*this);
 }

@@ -1,13 +1,12 @@
 #include "CommandEntry.h"
-#include "../Utils.h"
+#include "../Utils.hpp"
 
 #include <iostream>
 
-CommandEntry::CommandEntry(const std::string& inputValue) :
-    TableEntry(EntryType::COMMAND, inputValue), executed(false)
+CommandEntry::CommandEntry(const std::string& inputValue) : TableEntry(inputValue)
 {
     numberValue = 0;
-    outputWidth = inputValue.size();
+    executed = false;
 
     readCommand();
 }
@@ -36,6 +35,11 @@ unsigned int CommandEntry::getNumberWidth() const
         return std::to_string(whole).size() + 2;
     }
     return std::to_string(whole).size() + 3;
+}
+
+EntryType CommandEntry::getType() const
+{
+    return EntryType::COMMAND;
 }
 
 void CommandEntry::readCommand()
@@ -147,6 +151,11 @@ bool CommandEntry::getIsRightCell() const
 Operation CommandEntry::getOperation() const
 {
     return op;
+}
+
+TableEntry* CommandEntry::clone() const
+{
+    return new CommandEntry(*this);
 }
 
 double CommandEntry::getRNumberValue() const

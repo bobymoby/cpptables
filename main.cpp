@@ -7,6 +7,8 @@ int main()
     table.print();
     table.printNumberValues();
 
+    table.save("table2.txt");
+
     // Table table2("stressTable.txt");
     // table2.print();
     // table2.printNumberValues();

@@ -29,8 +29,15 @@ void TableCol::copyFrom(const TableCol& other)
     numberWidth = other.numberWidth;
     for (const TableEntry* cell : other.cells)
     {
-        cells.push_back(new TableEntry(*cell));
+        cells.push_back(cell->clone());
     }
+}
+
+void TableCol::moveFrom(TableCol&& other)
+{
+    outputWidth = other.outputWidth;
+    numberWidth = other.numberWidth;
+    cells = std::move(other.cells);
 }
 
 void TableCol::free()
@@ -60,9 +67,20 @@ TableCol::~TableCol()
     free();
 }
 
+TableCol::TableCol()
+{
+    outputWidth = 0;
+    numberWidth = 0;
+}
+
 TableCol::TableCol(const TableCol& other)
 {
     copyFrom(other);
+}
+
+TableCol::TableCol(TableCol&& other) noexcept
+{
+    moveFrom(std::move(other));
 }
 
 TableCol& TableCol::operator=(const TableCol& other)
@@ -71,6 +89,16 @@ TableCol& TableCol::operator=(const TableCol& other)
     {
         free();
         copyFrom(other);
+    }
+    return *this;
+}
+
+TableCol& TableCol::operator=(TableCol&& other) noexcept
+{
+    if (this != &other)
+    {
+        free();
+        moveFrom(std::move(other));
     }
     return *this;
 }

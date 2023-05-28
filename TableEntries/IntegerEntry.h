@@ -2,10 +2,14 @@
 
 #include "TableEntry.h"
 
-class IntegerEntry: public TableEntry
+class IntegerEntry : public TableEntry
 {
 public:
     IntegerEntry(const std::string& inputValue);
     double getNumberValue() const override;
     unsigned int getNumberWidth() const override;
+
+    EntryType getType() const override;
+
+    TableEntry* clone() const override;
 };

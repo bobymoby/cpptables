@@ -14,17 +14,19 @@ enum class EntryType
 class TableEntry
 {
 protected:
-    EntryType type;
     std::string inputValue;
-    unsigned int outputWidth;
-    unsigned int numberWidth;
 
-    TableEntry(EntryType type, const std::string& inputValue);
+    TableEntry(const std::string& inputValue);
 
 public:
-    EntryType getType() const;
-    unsigned int getOutputWidth() const;
     const std::string& getInputValue() const;
-    virtual double getNumberValue() const;
-    virtual unsigned int getNumberWidth() const;
+
+    virtual EntryType getType() const = 0;
+    unsigned int getOutputWidth() const;
+    virtual double getNumberValue() const = 0;
+    virtual unsigned int getNumberWidth() const = 0;
+
+    virtual TableEntry* clone() const = 0;
+
+    virtual ~TableEntry() = default;
 };

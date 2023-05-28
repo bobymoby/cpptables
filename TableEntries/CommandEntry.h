@@ -34,6 +34,9 @@ public:
     void execute(double result);
     double getNumberValue() const override;
     unsigned int getNumberWidth() const override;
+    EntryType getType() const override;
+
+
     bool hasExecuted() const;
 
     bool getIsLeftCell() const;
@@ -46,4 +49,6 @@ public:
     double getRNumberValue() const;
 
     Operation getOperation() const;
+
+    TableEntry* clone() const override;
 };

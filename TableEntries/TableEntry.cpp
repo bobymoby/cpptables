@@ -1,18 +1,8 @@
 #include "TableEntry.h"
 
-TableEntry::TableEntry(EntryType type, const std::string& inputValue):
-    type(type), inputValue(inputValue), outputWidth(0), numberWidth(1)
+TableEntry::TableEntry(const std::string& inputValue)
 {
-}
-
-EntryType TableEntry::getType() const
-{
-    return type;
-}
-
-unsigned int TableEntry::getOutputWidth() const
-{
-    return outputWidth;
+    this->inputValue = inputValue;
 }
 
 const std::string& TableEntry::getInputValue() const
@@ -20,12 +10,7 @@ const std::string& TableEntry::getInputValue() const
     return inputValue;
 }
 
-double TableEntry::getNumberValue() const
+unsigned int TableEntry::getOutputWidth() const
 {
-    return 0;
-}
-
-unsigned int TableEntry::getNumberWidth() const
-{
-    return 1;
+    return inputValue.size();
 }

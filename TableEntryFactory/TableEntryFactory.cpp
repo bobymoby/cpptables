@@ -130,5 +130,5 @@ TableEntry* TableEntryFactory::createEntry(const std::string& inputValue)
         }
         return new CommandEntry(inputValue);
     }
-    return new ErrorEntry(inputValue);
+    return new ErrorEntry(inputValue + " Unknown type.");
 }

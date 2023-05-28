@@ -1,4 +1,4 @@
-#include "Utils.h"
+#include "Utils.hpp"
 #include <string>
 
 size_t Utils::GetCharCount(std::ifstream& ifs, char ch)

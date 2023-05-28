@@ -1,7 +1,9 @@
 #include "Table.h"
 #include "TableEntryFactory/TableEntryFactory.h"
 #include "TableEntries/ErrorEntry.h"
-#include "Utils.h"
+#include "TableEntries/FloatEntry.h"
+#include "Utils.hpp"
+
 #include <iostream>
 #include <cmath>
 #include <iomanip>
@@ -14,6 +16,11 @@ void Table::copyFrom(const Table& other)
     }
 }
 
+void Table::moveFrom(Table&& other)
+{
+    cols = std::move(other.cols);
+}
+
 void Table::free()
 {
     for (TableCol* col : cols)
@@ -22,7 +29,7 @@ void Table::free()
     }
 }
 
-void Table::addEntry(std::string& entry, size_t colIndex, size_t rowIndex, size_t lineCount)
+void Table::addEntry(const std::string& entry, size_t colIndex, size_t rowIndex, size_t lineCount)
 {
     // Utils::strip(entry, ' ');
     while (colIndex >= cols.size())
@@ -56,13 +63,10 @@ void Table::execute(size_t colIndex, size_t rowIndex)
     TableEntry* currEntry = cols[colIndex]->getCells()[rowIndex];
     CommandEntry* command = dynamic_cast<CommandEntry*>(currEntry);
 
-    for (const TableEntry* entry : visited)
+    if (Utils::contains(visited, (const TableEntry*)currEntry))
     {
-        if (entry == currEntry)
-        {
-            makeCellError(colIndex, rowIndex, command->getInputValue() + " Circular reference!");
-            return;
-        }
+        makeCellError(colIndex, rowIndex, command->getInputValue() + " Circular reference");
+        return;
     }
 
     visited.push_back(cols[colIndex]->getCells()[rowIndex]);
@@ -86,13 +90,13 @@ void Table::execute(size_t colIndex, size_t rowIndex)
         lrowIndex = command->getLRIndex();
         if (lcolIndex == colIndex && lrowIndex == rowIndex)
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue() + " Self reference!");
+            makeCellError(colIndex, rowIndex, command->getInputValue() + " Self reference");
             visited.pop_back();
             return;
         }
         if (lcolIndex >= cols.size() || lrowIndex >= cols[lcolIndex]->getCells().size())
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue() + " Invalid reference!");
+            makeCellError(colIndex, rowIndex, command->getInputValue() + " Invalid reference");
             visited.pop_back();
             return;
         }
@@ -113,13 +117,13 @@ void Table::execute(size_t colIndex, size_t rowIndex)
         rrowIndex = command->getRRIndex();
         if (rcolIndex == colIndex && rrowIndex == rowIndex)
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue() + " Self reference!");
+            makeCellError(colIndex, rowIndex, command->getInputValue() + " Self reference");
             visited.pop_back();
             return;
         }
         if (rcolIndex >= cols.size() || rrowIndex >= cols[rcolIndex]->getCells().size())
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue() + " Invalid reference!");
+            makeCellError(colIndex, rowIndex, command->getInputValue() + " Invalid reference");
             visited.pop_back();
             return;
         }
@@ -149,7 +153,7 @@ void Table::execute(size_t colIndex, size_t rowIndex)
     case Operation::DIVIDE:
         if (rvalue == 0)
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue() + " Division by zero!");
+            makeCellError(colIndex, rowIndex, command->getInputValue() + " Division by zero");
             visited.pop_back();
             return;
         }
@@ -238,12 +242,27 @@ Table::Table(const Table& other)
     copyFrom(other);
 }
 
+Table::Table(Table&& other) noexcept
+{
+    moveFrom(std::move(other));
+}
+
 Table& Table::operator=(const Table& other)
 {
     if (this != &other)
     {
         free();
         copyFrom(other);
+    }
+    return *this;
+}
+
+Table& Table::operator=(Table&& other) noexcept
+{
+    if (this != &other)
+    {
+        free();
+        moveFrom(std::move(other));
     }
     return *this;
 }
@@ -270,6 +289,11 @@ void Table::read(std::ifstream& in)
 
     readInput(in);
     executeAll();
+}
+
+void Table::save()
+{
+    save(filename);
 }
 
 void Table::save(const std::string& filename) const
@@ -346,7 +370,6 @@ void Table::printNumberValues() const
         std::cout << "Empty table!" << std::endl;
         return;
     }
-    std::cout << std::setprecision(2) << std::fixed;
     std::cout << '+';
     for (size_t j = 0; j < cols.size(); j++)
     {
@@ -361,8 +384,19 @@ void Table::printNumberValues() const
         {
             TableEntry* entry = col->getCells()[i];
             double output = entry->getNumberValue();
-            std::cout << output << std::string(col->getNumberWidth() - entry->getNumberWidth() + 1, ' ');
+            if (entry->getType() == EntryType::FLOAT)
+            {
+                std::cout << std::setprecision(((FloatEntry*)entry)->getDecimalPlaces());
+                std::cout << std::fixed;
+            }
+            std::cout << output;
+            std::cout << std::string(col->getNumberWidth() - entry->getNumberWidth() + 1, ' ');
+            // std::cout << output << std::string(col->getNumberWidth() - entry->getNumberWidth() + 1, ' ');
             std::cout << "| ";
+
+            std::cout << std::setprecision(6);
+            std::cout << std::defaultfloat;
+
         }
         std::cout << std::endl;
         std::cout << '+';
