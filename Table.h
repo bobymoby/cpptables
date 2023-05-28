@@ -21,7 +21,8 @@ private:
     void executeAll();
     void execute(size_t colIndex, size_t rowIndex);
 
-    void makeCellError(size_t colIndex, size_t rowIndex, const std::string& errorMsg);
+    void makeCellError(size_t colIndex, size_t rowIndex, const std::string& inputValue, const std::string& errorMsg);
+    void printErrors() const;
 
     void readInput(std::ifstream& in);
 

@@ -1,7 +1,13 @@
 #include "ErrorEntry.h"
 
-ErrorEntry::ErrorEntry(const std::string& value) : TableEntry("ERROR: " + value)
+ErrorEntry::ErrorEntry(const std::string& value, const std::string& errorMsg) : TableEntry(value)
 {
+    this->errorMsg = errorMsg;
+}
+
+const std::string& ErrorEntry::getErrorMsg() const
+{
+    return errorMsg;
 }
 
 EntryType ErrorEntry::getType() const

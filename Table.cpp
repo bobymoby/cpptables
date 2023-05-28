@@ -65,7 +65,7 @@ void Table::execute(size_t colIndex, size_t rowIndex)
 
     if (Utils::contains(visited, (const TableEntry*)currEntry))
     {
-        makeCellError(colIndex, rowIndex, command->getInputValue() + " Circular reference");
+        makeCellError(colIndex, rowIndex, command->getInputValue(), "Circular reference");
         return;
     }
 
@@ -90,13 +90,13 @@ void Table::execute(size_t colIndex, size_t rowIndex)
         lrowIndex = command->getLRIndex();
         if (lcolIndex == colIndex && lrowIndex == rowIndex)
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue() + " Self reference");
+            makeCellError(colIndex, rowIndex, command->getInputValue(), "Self reference");
             visited.pop_back();
             return;
         }
         if (lcolIndex >= cols.size() || lrowIndex >= cols[lcolIndex]->getCells().size())
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue() + " Invalid reference");
+            makeCellError(colIndex, rowIndex, command->getInputValue(), "Invalid reference");
             visited.pop_back();
             return;
         }
@@ -117,13 +117,13 @@ void Table::execute(size_t colIndex, size_t rowIndex)
         rrowIndex = command->getRRIndex();
         if (rcolIndex == colIndex && rrowIndex == rowIndex)
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue() + " Self reference");
+            makeCellError(colIndex, rowIndex, command->getInputValue(), "Self reference");
             visited.pop_back();
             return;
         }
         if (rcolIndex >= cols.size() || rrowIndex >= cols[rcolIndex]->getCells().size())
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue() + " Invalid reference");
+            makeCellError(colIndex, rowIndex, command->getInputValue(), "Invalid reference");
             visited.pop_back();
             return;
         }
@@ -153,7 +153,7 @@ void Table::execute(size_t colIndex, size_t rowIndex)
     case Operation::DIVIDE:
         if (rvalue == 0)
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue() + " Division by zero");
+            makeCellError(colIndex, rowIndex, command->getInputValue(), "Division by zero");
             visited.pop_back();
             return;
         }
@@ -171,9 +171,24 @@ void Table::execute(size_t colIndex, size_t rowIndex)
 
 }
 
-void Table::makeCellError(size_t colIndex, size_t rowIndex, const std::string& errorMsg)
+void Table::makeCellError(size_t colIndex, size_t rowIndex, const std::string& inputValue, const std::string& errorMsg)
 {
-    cols[colIndex]->setCell(rowIndex, new ErrorEntry(errorMsg));
+    cols[colIndex]->setCell(rowIndex, new ErrorEntry(inputValue, errorMsg));
+}
+
+void Table::printErrors() const
+{
+    for (size_t col = 0; col < cols.size(); col++)
+    {
+        for (size_t row = 0; row < cols[col]->getCells().size(); row++)
+        {
+            if (cols[col]->getCells()[row]->getType() == EntryType::ERROR)
+            {
+                ErrorEntry* error = (ErrorEntry*)(cols[col]->getCells()[row]);
+                std::cout << 'R' << row << 'C' << col << ": " << error->getErrorMsg() << std::endl;
+            }
+        }
+    }
 }
 
 void Table::readInput(std::ifstream& in)
@@ -228,6 +243,8 @@ Table::Table(const std::string& filename)
     file.close();
 
     executeAll();
+
+    printErrors();
 }
 
 Table::Table(std::ifstream& in)
@@ -235,6 +252,8 @@ Table::Table(std::ifstream& in)
     this->filename = in.getloc().name();
     readInput(in);
     executeAll();
+
+    printErrors();
 }
 
 Table::Table(const Table& other)

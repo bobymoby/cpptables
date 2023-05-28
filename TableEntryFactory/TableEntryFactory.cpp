@@ -126,9 +126,9 @@ TableEntry* TableEntryFactory::createEntry(const std::string& inputValue)
     {
         if (isFalseCommand(inputValue))
         {
-            return new ErrorEntry(inputValue + " has 0 or more than 1 operation signs.");
+            return new ErrorEntry(inputValue, "0 or more than 1 operation signs");
         }
         return new CommandEntry(inputValue);
     }
-    return new ErrorEntry(inputValue + " Unknown type.");
+    return new ErrorEntry(inputValue, "Unknown type");
 }

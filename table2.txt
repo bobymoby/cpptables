@@ -1,2 +1,2 @@
-ERROR: random string Unknown type.,0
-3.20,
+random string,0
+=R1C0+2,
