@@ -63,18 +63,18 @@ void Table::execute(size_t colIndex, size_t rowIndex)
     TableEntry* currEntry = cols[colIndex]->getCells()[rowIndex];
     CommandEntry* command = dynamic_cast<CommandEntry*>(currEntry);
 
-    if (Utils::contains(visited, (const TableEntry*)currEntry))
-    {
-        makeCellError(colIndex, rowIndex, command->getInputValue(), "Circular reference");
-        return;
-    }
-
-    visited.push_back(cols[colIndex]->getCells()[rowIndex]);
-
     if (command->hasExecuted())
     {
         return;
     }
+
+    if (Utils::contains(visited, (const TableEntry*)currEntry))
+    {
+        makeCellError(colIndex, rowIndex, "Circular reference");
+        return;
+    }
+
+    visited.push_back(cols[colIndex]->getCells()[rowIndex]);
 
     double result = 0;
     double lvalue = 0;
@@ -90,19 +90,27 @@ void Table::execute(size_t colIndex, size_t rowIndex)
         lrowIndex = command->getLRIndex();
         if (lcolIndex == colIndex && lrowIndex == rowIndex)
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue(), "Self reference");
+            makeCellError(colIndex, rowIndex, "Self reference");
             visited.pop_back();
             return;
         }
         if (lcolIndex >= cols.size() || lrowIndex >= cols[lcolIndex]->getCells().size())
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue(), "Invalid reference");
+            makeCellError(colIndex, rowIndex, "Invalid reference");
             visited.pop_back();
             return;
         }
         if (cols[lcolIndex]->getCells()[lrowIndex]->getType() == EntryType::COMMAND)
         {
             execute(lcolIndex, lrowIndex);
+        }
+        if (cols[lcolIndex]->getCells()[lrowIndex]->getType() == EntryType::ERROR)
+        {
+            ErrorEntry* err = dynamic_cast<ErrorEntry*>(cols[lcolIndex]->getCells()[lrowIndex]);
+            std::string errorMsg = err->getErrorMsg() + " in R" + std::to_string(lcolIndex) + "C" + std::to_string(lrowIndex);
+            makeCellError(colIndex, rowIndex, errorMsg);
+            visited.pop_back();
+            return;
         }
         lvalue = cols[lcolIndex]->getCells()[lrowIndex]->getNumberValue();
     }
@@ -117,19 +125,27 @@ void Table::execute(size_t colIndex, size_t rowIndex)
         rrowIndex = command->getRRIndex();
         if (rcolIndex == colIndex && rrowIndex == rowIndex)
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue(), "Self reference");
+            makeCellError(colIndex, rowIndex, "Self reference");
             visited.pop_back();
             return;
         }
         if (rcolIndex >= cols.size() || rrowIndex >= cols[rcolIndex]->getCells().size())
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue(), "Invalid reference");
+            makeCellError(colIndex, rowIndex, "Invalid reference");
             visited.pop_back();
             return;
         }
         if (cols[rcolIndex]->getCells()[rrowIndex]->getType() == EntryType::COMMAND)
         {
             execute(rcolIndex, rrowIndex);
+        }
+        if (cols[rcolIndex]->getCells()[rrowIndex]->getType() == EntryType::ERROR)
+        {
+            ErrorEntry* err = dynamic_cast<ErrorEntry*>(cols[rcolIndex]->getCells()[rrowIndex]);
+            std::string errorMsg = err->getErrorMsg() + " in R" + std::to_string(rcolIndex) + "C" + std::to_string(rrowIndex);
+            makeCellError(colIndex, rowIndex, errorMsg);
+            visited.pop_back();
+            return;
         }
         rvalue = cols[rcolIndex]->getCells()[rrowIndex]->getNumberValue();
     }
@@ -153,7 +169,7 @@ void Table::execute(size_t colIndex, size_t rowIndex)
     case Operation::DIVIDE:
         if (rvalue == 0)
         {
-            makeCellError(colIndex, rowIndex, command->getInputValue(), "Division by zero");
+            makeCellError(colIndex, rowIndex, "Division by zero");
             visited.pop_back();
             return;
         }
@@ -171,9 +187,14 @@ void Table::execute(size_t colIndex, size_t rowIndex)
 
 }
 
-void Table::makeCellError(size_t colIndex, size_t rowIndex, const std::string& inputValue, const std::string& errorMsg)
+void Table::makeCellError(size_t colIndex, size_t rowIndex, const std::string& errorMsg)
 {
-    cols[colIndex]->setCell(rowIndex, new ErrorEntry(inputValue, errorMsg));
+    TableEntry* currEntry = cols[colIndex]->getCells()[rowIndex];
+    if (currEntry->getType() == EntryType::ERROR)
+    {
+        return;
+    }
+    cols[colIndex]->setCell(rowIndex, new ErrorEntry(currEntry->getInputValue(), errorMsg));
 }
 
 void Table::printErrors() const
