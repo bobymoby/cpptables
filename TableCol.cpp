@@ -55,7 +55,7 @@ TableCol::TableCol(const MyVector<TableEntry*>& cells) : cells(cells)
 
 TableCol::TableCol(size_t size)
 {
-    cells.resize(size);
+    cells.fill(size, nullptr);
     for (size_t i = 0; i < size; i++)
     {
         cells[i] = new TypeNullEntry();
