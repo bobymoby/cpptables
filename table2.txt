@@ -1,2 +1,0 @@
-random string,0
-=R1C0+2,
