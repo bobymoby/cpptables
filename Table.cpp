@@ -2,6 +2,7 @@
 #include "TableEntryFactory/TableEntryFactory.h"
 #include "TableEntries/ErrorEntry.h"
 #include "TableEntries/FloatEntry.h"
+#include "TableEntries/TypeNullEntry.h"
 #include "Utils.hpp"
 
 #include <iostream>
@@ -45,6 +46,28 @@ void Table::addEntry(const MyString& entry, size_t colIndex, size_t rowIndex, si
 
 void Table::executeAll()
 {
+    //reset errors
+    visited.clear();
+    TableEntry* currEntry;
+    for (size_t colIndex = 0; colIndex < cols.size(); colIndex++)
+    {
+        for (size_t rowIndex = 0; rowIndex < cols[colIndex]->getCells().size(); rowIndex++)
+        {
+            currEntry = cols[colIndex]->getCells()[rowIndex];
+            if (currEntry->getType() == EntryType::ERROR)
+            {
+                ErrorEntry* error = dynamic_cast<ErrorEntry*>(currEntry);
+                TableEntry* newEntry = TableEntryFactory::createEntry(error->getInputValue());
+                cols[colIndex]->setCell(rowIndex, newEntry);
+            }
+            else if (currEntry->getType() == EntryType::COMMAND)
+            {
+                CommandEntry* command = dynamic_cast<CommandEntry*>(currEntry);
+                command->reset();
+            }
+
+        }
+    }
     for (size_t colIndex = 0; colIndex < cols.size(); colIndex++)
     {
         for (size_t rowIndex = 0; rowIndex < cols[colIndex]->getCells().size(); rowIndex++)
@@ -60,6 +83,8 @@ void Table::executeAll()
     {
         col->updateWidth();
     }
+
+    printErrors();
 }
 
 void Table::execute(size_t colIndex, size_t rowIndex)
@@ -247,8 +272,6 @@ Table::Table(const MyString& filename)
     file.close();
 
     executeAll();
-
-    printErrors();
 }
 
 Table::Table(std::ifstream& in)
@@ -256,8 +279,6 @@ Table::Table(std::ifstream& in)
     this->filename = in.getloc().name();
     readInput(in);
     executeAll();
-
-    printErrors();
 }
 
 Table::Table(const Table& other)
@@ -414,7 +435,6 @@ void Table::printNumberValues() const
             }
             std::cout << output;
             std::cout << MyString(col->getNumberWidth() - entry->getNumberWidth() + 1, ' ');
-            // std::cout << output << MyString(col->getNumberWidth() - entry->getNumberWidth() + 1, ' ');
             std::cout << "| ";
 
             std::cout << std::setprecision(6);
@@ -432,6 +452,39 @@ void Table::printNumberValues() const
     }
 }
 
+void Table::printTypes() const
+{
+    EntryType type;
+    for (size_t i = 0; i < cols.size(); i++)
+    {
+        for (size_t j = 0; j < cols[i]->getCells().size(); j++)
+        {
+            type = cols[i]->getCells()[j]->getType();
+            switch (type)
+            {
+            case EntryType::STRING:
+                std::cout << "S";
+                break;
+            case EntryType::FLOAT:
+                std::cout << "F";
+                break;
+            case EntryType::COMMAND:
+                std::cout << "C";
+                break;
+            case EntryType::INTEGER:
+                std::cout << "I";
+                break;
+            case EntryType::ERROR:
+                std::cout << "E";
+                break;
+            default:
+                std::cout << "N";
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
 void Table::setCell(size_t row, size_t col, const MyString& value)
 {
     if (row >= cols[0]->getCells().size() || col >= cols.size())
@@ -440,6 +493,30 @@ void Table::setCell(size_t row, size_t col, const MyString& value)
     }
     TableEntry* cell = TableEntryFactory::createEntry(value);
     cols[col]->setCell(row, cell);
+
+    executeAll();
+}
+
+void Table::addCol()
+{
+    if (cols.empty())
+    {
+        cols.push_back(new TableCol(1));
+        return;
+    }
+    cols.push_back(new TableCol(cols[0]->getCells().size()));
+}
+
+void Table::addRow()
+{
+    if (cols.empty())
+    {
+        cols.push_back(new TableCol(1));
+    }
+    for (TableCol* col : cols)
+    {
+        col->addCell(new TypeNullEntry());
+    }
 }
 
 const MyString& Table::getFilename() const

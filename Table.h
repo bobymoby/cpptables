@@ -47,8 +47,12 @@ public:
 
     void print() const;
     void printNumberValues() const;
+    void printTypes() const;
 
     void setCell(size_t row, size_t col, const MyString& value);
+    void addRow();
+    void addCol();
+
 
     const MyString& getFilename() const;
 };

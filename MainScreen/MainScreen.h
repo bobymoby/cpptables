@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Table.h"
+#include "../Table.h"
 
 class MainScreen
 {

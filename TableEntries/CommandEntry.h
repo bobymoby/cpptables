@@ -38,6 +38,8 @@ public:
 
 
     bool hasExecuted() const;
+    void reset();
+
 
     bool getIsLeftCell() const;
     size_t getLCIndex() const;

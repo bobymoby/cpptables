@@ -1,5 +1,5 @@
 #include "MainScreen.h"
-#include "Utils.hpp"
+#include "../Utils.hpp"
 
 
 
@@ -9,45 +9,73 @@ void MainScreen::run()
     while (true)
     {
         std::cout << "> ";
-        // std::cin >> command;
+        std::cin >> command;
 
-        if (Utils::strcmp(command.c_str(), "exit") == 0)
+        const char* commandStr = command.c_str();
+
+        if (Utils::strcmp(commandStr, "exit") == 0)
         {
             break;
         }
-        if (Utils::strcmp(command.c_str(), "load") == 0)
+        else if (Utils::strcmp(commandStr, "load") == 0)
         {
             MyString fileName;
             std::cout << "Enter file name: ";
-            // std::cin >> fileName;
+            std::cin >> fileName;
             _table = Table(fileName);
         }
-        if (Utils::strcmp(command.c_str(), "save") == 0)
+        else if (Utils::strcmp(commandStr, "save") == 0)
         {
             MyString fileName;
             std::cout << "Enter file name: ";
-            // std::cin >> fileName;
+            std::cin >> fileName;
             _table.save(fileName);
         }
-        if (Utils::strcmp(command.c_str(), "print") == 0)
+        else if (Utils::strcmp(commandStr, "print") == 0)
         {
             std::cout << "Table: " << _table.getFilename() << std::endl;
             std::cout << "Input values:" << std::endl;
             _table.print();
             std::cout << "Output values:" << std::endl;
             _table.printNumberValues();
+            std::cout << "Types:" << std::endl;
+            _table.printTypes();
         }
-        if (Utils::strcmp(command.c_str(), "setcell") == 0)
+        else if (Utils::strcmp(commandStr, "setcell") == 0)
         {
             size_t row, col;
             std::cout << "Enter row(starts from 0):";
-            // std::cin >> row;
+            std::cin >> row;
             std::cout << "Enter col(starts from 0): ";
-            // std::cin >> col;
+            std::cin >> col;
             MyString value;
             std::cout << "Enter value: ";
-            // std::cin >> value;
+            std::cin.ignore();
+            std::cin >> value;
             _table.setCell(row, col, value);
+        }
+        else if (Utils::strcmp(commandStr, "addrow") == 0)
+        {
+            _table.addRow();
+        }
+        else if (Utils::strcmp(commandStr, "addcol") == 0)
+        {
+            _table.addCol();
+        }
+        else if (Utils::strcmp(commandStr, "help") == 0)
+        {
+            std::cout << "exit - exits the program" << std::endl;
+            std::cout << "load - loads a table from a file" << std::endl;
+            std::cout << "save - saves the table to a file" << std::endl;
+            std::cout << "print - prints the table" << std::endl;
+            std::cout << "setcell - sets a cell value" << std::endl;
+            std::cout << "addrow - adds a row" << std::endl;
+            std::cout << "addcol - adds a column" << std::endl;
+            std::cout << "help - prints this message" << std::endl;
+        }
+        else
+        {
+            std::cout << "Invalid command!" << std::endl;
         }
     }
 }

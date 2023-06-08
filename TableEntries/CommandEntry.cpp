@@ -173,6 +173,12 @@ bool CommandEntry::hasExecuted() const
     return executed;
 }
 
+void CommandEntry::reset()
+{
+    executed = false;
+    numberValue = 0;
+}
+
 void CommandEntry::readIndexes(MyString& str, bool isLeft)
 {
     Utils::strip(str, ' ');
