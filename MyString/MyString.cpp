@@ -41,7 +41,7 @@ void MyString::resize(size_t newCapacity)
 
 MyString::MyString(size_t capacity)
 {
-    _size = 1;
+    _size = 0;
     _capacity = capacity;
     _data = new char[_capacity];
     _data[0] = '\0';
@@ -86,7 +86,7 @@ MyString::MyString(const std::string& str)
 
 MyString::MyString()
 {
-    _size = 1;
+    _size = 0;
     _capacity = 8;
     _data = new char[_capacity];
     _data[0] = '\0';

@@ -27,6 +27,7 @@ public:
     void push_back(const T& value);
     void pop_back();
 
+    void fill(size_t size, const T& value);
     void resize(size_t newCapacity);
     void clear();
 
@@ -76,6 +77,20 @@ void MyVector<T>::moveFrom(MyVector<T>&& other)
     other._data = nullptr;
     other._size = 0;
     other._capacity = 0;
+}
+
+template<typename T>
+void MyVector<T>::fill(size_t size, const T& value)
+{
+    if (size > _capacity)
+    {
+        resize(size);
+    }
+    for (size_t i = 0; i < size; i++)
+    {
+        _data[i] = value;
+    }
+    _size = size;
 }
 
 template<typename T>
