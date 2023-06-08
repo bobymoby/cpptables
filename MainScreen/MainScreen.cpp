@@ -3,6 +3,15 @@
 
 
 
+bool MainScreen::isTableOpen() const
+{
+    return usingDynamicTable || _table.getFilename().size() > 0;
+}
+
+MainScreen::MainScreen() : _table(), usingDynamicTable(true)
+{
+}
+
 void MainScreen::run()
 {
     MyString command;
@@ -13,7 +22,8 @@ void MainScreen::run()
 
         const char* commandStr = command.c_str();
 
-        if (Utils::strcmp(commandStr, "exit") == 0)
+        if (Utils::strcmp(commandStr, "exit") == 0
+            || Utils::strcmp(commandStr, "quit") == 0)
         {
             break;
         }
@@ -22,10 +32,23 @@ void MainScreen::run()
             MyString fileName;
             std::cout << "Enter file name: ";
             std::cin >> fileName;
-            _table = Table(fileName);
+            try
+            {
+                _table = Table(fileName);
+                usingDynamicTable = false;
+            }
+            catch (const std::exception& e)
+            {
+                std::cout << e.what() << std::endl;
+            }
         }
         else if (Utils::strcmp(commandStr, "save") == 0)
         {
+            if (!isTableOpen())
+            {
+                std::cout << "There is no open table" << std::endl;
+                continue;
+            }
             MyString fileName;
             std::cout << "Enter file name: ";
             std::cin >> fileName;
@@ -33,16 +56,44 @@ void MainScreen::run()
         }
         else if (Utils::strcmp(commandStr, "print") == 0)
         {
+            if (!isTableOpen())
+            {
+                std::cout << "There is no open table" << std::endl;
+                continue;
+            }
             std::cout << "Table: " << _table.getFilename() << std::endl;
-            std::cout << "Input values:" << std::endl;
-            _table.print();
             std::cout << "Output values:" << std::endl;
             _table.printNumberValues();
+        }
+        else if (Utils::strcmp(commandStr, "printInput") == 0)
+        {
+            if (!isTableOpen())
+            {
+                std::cout << "There is no open table" << std::endl;
+                continue;
+            }
+            std::cout << "Table: " << _table.getFilename() << std::endl;
+            std::cout << "Input values:" << std::endl;
+            _table.printInput();
+        }
+        else if (Utils::strcmp(commandStr, "printTypes") == 0)
+        {
+            if (!isTableOpen())
+            {
+                std::cout << "There is no open table" << std::endl;
+                continue;
+            }
+            std::cout << "Table: " << _table.getFilename() << std::endl;
             std::cout << "Types:" << std::endl;
             _table.printTypes();
         }
         else if (Utils::strcmp(commandStr, "setcell") == 0)
         {
+            if (!isTableOpen())
+            {
+                std::cout << "There is no open table" << std::endl;
+                continue;
+            }
             size_t row, col;
             std::cout << "Enter row(starts from 0): ";
             std::cin >> row;
@@ -67,7 +118,9 @@ void MainScreen::run()
             std::cout << "exit - exits the program" << std::endl;
             std::cout << "load - loads a table from a file" << std::endl;
             std::cout << "save - saves the table to a file" << std::endl;
-            std::cout << "print - prints the table" << std::endl;
+            std::cout << "print - prints the output table" << std::endl;
+            std::cout << "printInput - prints the input table" << std::endl;
+            std::cout << "printTypes - prints the types of the cells" << std::endl;
             std::cout << "setcell - sets a cell value" << std::endl;
             std::cout << "addrow - adds a row" << std::endl;
             std::cout << "addcol - adds a column" << std::endl;

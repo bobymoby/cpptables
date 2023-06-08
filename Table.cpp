@@ -197,7 +197,7 @@ void Table::readInput(std::ifstream& in)
 {
     if (!in.is_open())
     {
-        throw std::runtime_error("File not open!");
+        throw std::invalid_argument("Could not open file");
     }
     size_t lineCount = Utils::GetLineCount(in);
     MyString line;
@@ -363,17 +363,34 @@ void Table::save(std::ofstream& out) const
     {
         for (size_t colIndex = 0; colIndex < cols.size(); colIndex++)
         {
-            out << cols[colIndex]->getCells()[rowIndex]->getInputValue();
+            TableEntry* entry = cols[colIndex]->getCells()[rowIndex];
+            if (entry->getType() == EntryType::STRING)
+            {
+                out << '"';
+                const MyString& str = entry->getInputValue();
+                for (size_t i = 0; i < str.size(); i++)
+                {
+                    if (str[i] == '"')
+                    {
+                        out << '\\';
+                    }
+                    out << str[i];
+                }
+                out << '"';
+            }
+            else
+            {
+                out << entry->getInputValue();
+            }
             if (colIndex != cols.size() - 1)
             {
                 out << ',';
             }
         }
-        out << std::endl;
     }
 }
 
-void Table::print() const
+void Table::printInput() const
 {
     if (cols.empty())
     {
@@ -525,6 +542,11 @@ void Table::addCol()
         return;
     }
     cols.push_back(new TableCol(cols[0]->getCells().size()));
+    for (size_t i = 0; i < cols[0]->getCells().size(); i++)
+    {
+        cols.back()->addCell(new TypeNullEntry());
+    }
+
 }
 
 void Table::addRow()

@@ -45,7 +45,7 @@ public:
     void save(const MyString& filename) const;
     void save(std::ofstream& out) const;
 
-    void print() const;
+    void printInput() const;
     void printNumberValues() const;
     void printTypes() const;
 
