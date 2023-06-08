@@ -44,7 +44,7 @@ void MainScreen::run()
         else if (Utils::strcmp(commandStr, "setcell") == 0)
         {
             size_t row, col;
-            std::cout << "Enter row(starts from 0):";
+            std::cout << "Enter row(starts from 0): ";
             std::cin >> row;
             std::cout << "Enter col(starts from 0): ";
             std::cin >> col;

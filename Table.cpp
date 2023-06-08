@@ -111,7 +111,7 @@ void Table::execute(size_t colIndex, size_t rowIndex)
 
     if (command->getIsLeftCell())
     {
-        if (parseCommandArg(colIndex, rowIndex, command->getLCIndex(), command->getLRIndex(), lvalue))
+        if (!parseCommandArg(colIndex, rowIndex, command->getLCIndex(), command->getLRIndex(), lvalue))
         {
             visited.pop_back();
             return;
@@ -124,7 +124,7 @@ void Table::execute(size_t colIndex, size_t rowIndex)
 
     if (command->getIsRightCell())
     {
-        if (parseCommandArg(colIndex, rowIndex, command->getRCIndex(), command->getRRIndex(), rvalue))
+        if (!parseCommandArg(colIndex, rowIndex, command->getRCIndex(), command->getRRIndex(), rvalue))
         {
             visited.pop_back();
             return;
@@ -455,31 +455,51 @@ void Table::printNumberValues() const
 void Table::printTypes() const
 {
     EntryType type;
-    for (size_t i = 0; i < cols.size(); i++)
+    if (cols.empty())
     {
-        for (size_t j = 0; j < cols[i]->getCells().size(); j++)
+        std::cout << "Empty table!" << std::endl;
+        return;
+    }
+    std::cout << '+';
+    for (size_t j = 0; j < cols[0]->getCells().size(); j++)
+    {
+        std::cout << MyString(9, '-');
+        std::cout << '+';
+    }
+    std::cout << std::endl;
+    for (size_t j = 0; j < cols[0]->getCells().size(); j++)
+    {
+        std::cout << "|";
+        for (size_t i = 0; i < cols.size(); i++)
         {
             type = cols[i]->getCells()[j]->getType();
             switch (type)
             {
             case EntryType::STRING:
-                std::cout << "S";
+                std::cout << " String  |";
                 break;
             case EntryType::FLOAT:
-                std::cout << "F";
+                std::cout << " Float   |";
                 break;
             case EntryType::COMMAND:
-                std::cout << "C";
+                std::cout << " Command |";
                 break;
             case EntryType::INTEGER:
-                std::cout << "I";
+                std::cout << " Integer |";
                 break;
             case EntryType::ERROR:
-                std::cout << "E";
+                std::cout << " Error   |";
                 break;
             default:
-                std::cout << "N";
+                std::cout << " Null    |";
             }
+        }
+        std::cout << std::endl;
+        std::cout << '+';
+        for (size_t j = 0; j < cols[0]->getCells().size(); j++)
+        {
+            std::cout << MyString(9, '-');
+            std::cout << '+';
         }
         std::cout << std::endl;
     }
