@@ -7,10 +7,10 @@
 class Table
 {
 private:
-    std::vector<TableCol*> cols;
+    MyVector<TableCol*> cols;
     MyString filename;
 
-    std::vector<const TableEntry*> visited; //used for detecting circular dependencies
+    MyVector<const TableEntry*> visited; //used for detecting circular dependencies
 
     void free();
     void copyFrom(const Table& other);

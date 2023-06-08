@@ -48,7 +48,7 @@ void TableCol::free()
     }
 }
 
-TableCol::TableCol(const std::vector<TableEntry*>& cells) : cells(cells)
+TableCol::TableCol(const MyVector<TableEntry*>& cells) : cells(cells)
 {
     updateWidth();
 }
@@ -103,7 +103,7 @@ TableCol& TableCol::operator=(TableCol&& other) noexcept
     return *this;
 }
 
-const std::vector<TableEntry*>& TableCol::getCells() const
+const MyVector<TableEntry*>& TableCol::getCells() const
 {
     return cells;
 }

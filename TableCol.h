@@ -4,11 +4,12 @@
 
 #include "TableEntries/TableEntry.h"
 #include "TableEntries/CommandEntry.h"
+#include "MyVector/MyVector.hpp"
 
 class TableCol
 {
 private:
-    std::vector<TableEntry*> cells;
+    MyVector<TableEntry*> cells;
     unsigned int outputWidth;
     unsigned int numberWidth;
 
@@ -17,7 +18,7 @@ private:
     void copyFrom(const TableCol& other);
     void moveFrom(TableCol&& other);
 public:
-    TableCol(const std::vector<TableEntry*>& cells);
+    TableCol(const MyVector<TableEntry*>& cells);
     TableCol(size_t size);
 
     TableCol();
@@ -27,7 +28,7 @@ public:
     TableCol& operator=(TableCol&& other) noexcept;
     ~TableCol();
 
-    const std::vector<TableEntry*>& getCells() const;
+    const MyVector<TableEntry*>& getCells() const;
     void setCell(size_t index, TableEntry* cell);
     void addCell(TableEntry* cell);
     unsigned int getOutputWidth() const;

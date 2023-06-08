@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "MyString/MyString.h"
+#include "MyVector/MyVector.hpp"
 
 namespace Utils
 {
@@ -22,11 +23,11 @@ namespace Utils
     size_t strlen(const char* str);
 
     template <typename T>
-    bool contains(const std::vector<T>& vec, const T& element);
+    bool contains(const MyVector<T>& vec, const T& element);
 };
 
 template <typename T>
-bool Utils::contains(const std::vector<T>& vec, const T& element)
+bool Utils::contains(const MyVector<T>& vec, const T& element)
 {
     for (const T& item : vec)
     {
