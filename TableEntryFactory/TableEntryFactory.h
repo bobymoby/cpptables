@@ -5,14 +5,14 @@
 class TableEntryFactory
 {
 private:
-    static bool isString(const std::string& inputValue);
-    static bool isInteger(const std::string& inputValue);
-    static bool isFloat(const std::string& inputValue);
-    static bool isCommand(const std::string& inputValue);
-    static bool isFalseCommand(const std::string& inputValue);
-    static bool isTypeNull(const std::string& inputValue);
+    static bool isString(const MyString& inputValue);
+    static bool isInteger(const MyString& inputValue);
+    static bool isFloat(const MyString& inputValue);
+    static bool isCommand(const MyString& inputValue);
+    static bool isFalseCommand(const MyString& inputValue);
+    static bool isTypeNull(const MyString& inputValue);
 
 public:
-    static TableEntry* createEntry(const std::string& inputValue);
+    static TableEntry* createEntry(const MyString& inputValue);
 
 };

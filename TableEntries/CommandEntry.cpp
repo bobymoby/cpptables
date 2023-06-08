@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-CommandEntry::CommandEntry(const std::string& inputValue) : TableEntry(inputValue)
+CommandEntry::CommandEntry(const MyString& inputValue) : TableEntry(inputValue)
 {
     numberValue = 0;
     executed = false;
@@ -44,32 +44,32 @@ EntryType CommandEntry::getType() const
 
 void CommandEntry::readCommand()
 {
-    std::string inputStr = inputValue.substr(1);
+    MyString inputStr = inputValue.substr(1);
 
-    std::string lside;
-    std::string rside;
+    MyString lside;
+    MyString rside;
 
-    if (inputStr.find('+') != std::string::npos)
+    if (inputStr.find('+') != MyString::npos)
     {
         op = Operation::ADD;
         Utils::split(inputStr, '+', lside, rside);
     }
-    else if (inputStr.find('-') != std::string::npos)
+    else if (inputStr.find('-') != MyString::npos)
     {
         op = Operation::SUBTRACT;
         Utils::split(inputStr, '-', lside, rside);
     }
-    else if (inputStr.find('*') != std::string::npos)
+    else if (inputStr.find('*') != MyString::npos)
     {
         op = Operation::MULTIPLY;
         Utils::split(inputStr, '*', lside, rside);
     }
-    else if (inputStr.find('/') != std::string::npos)
+    else if (inputStr.find('/') != MyString::npos)
     {
         op = Operation::DIVIDE;
         Utils::split(inputStr, '/', lside, rside);
     }
-    else if (inputStr.find('^') != std::string::npos)
+    else if (inputStr.find('^') != MyString::npos)
     {
         op = Operation::POWER;
         Utils::split(inputStr, '^', lside, rside);
@@ -91,7 +91,7 @@ void CommandEntry::readCommand()
         isLeftCell = false;
         try
         {
-            leftNumberValue = std::stod(lside);
+            leftNumberValue = std::stod(lside.c_str());
         }
         catch (const std::exception&)
         {
@@ -109,7 +109,7 @@ void CommandEntry::readCommand()
         isRightCell = false;
         try
         {
-            rightNumberValue = std::stod(rside);
+            rightNumberValue = std::stod(rside.c_str());
         }
         catch (const std::exception&)
         {
@@ -173,7 +173,7 @@ bool CommandEntry::hasExecuted() const
     return executed;
 }
 
-void CommandEntry::readIndexes(std::string& str, bool isLeft)
+void CommandEntry::readIndexes(MyString& str, bool isLeft)
 {
     Utils::strip(str, ' ');
     size_t startIndex = 1;
@@ -182,9 +182,9 @@ void CommandEntry::readIndexes(std::string& str, bool isLeft)
     {
         index++;
     }
-    size_t rowIndex = std::stoi(str.substr(startIndex, index - startIndex));
+    size_t rowIndex = std::stoi(str.substr(startIndex, index - startIndex).c_str());
     index++;
-    size_t colIndex = std::stoi(str.substr(index));
+    size_t colIndex = std::stoi(str.substr(index).c_str());
 
     if (isLeft)
     {

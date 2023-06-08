@@ -9,12 +9,12 @@
 #include <iostream>
 
 
-bool TableEntryFactory::isString(const std::string& inputValue)
+bool TableEntryFactory::isString(const MyString& inputValue)
 {
     return inputValue.front() == '"' && inputValue.back() == '"';
 }
 
-bool TableEntryFactory::isInteger(const std::string& inputValue)
+bool TableEntryFactory::isInteger(const MyString& inputValue)
 {
     bool hasSign = inputValue.front() == '+' || inputValue.front() == '-';
     for (int i = hasSign; i < inputValue.size(); i++)
@@ -27,7 +27,7 @@ bool TableEntryFactory::isInteger(const std::string& inputValue)
     return true;
 }
 
-bool TableEntryFactory::isFloat(const std::string& inputValue)
+bool TableEntryFactory::isFloat(const MyString& inputValue)
 {
     bool hasSign = inputValue.front() == '+' || inputValue.front() == '-';
     bool hasDot = false;
@@ -49,12 +49,12 @@ bool TableEntryFactory::isFloat(const std::string& inputValue)
     return true;
 }
 
-bool TableEntryFactory::isCommand(const std::string& inputValue)
+bool TableEntryFactory::isCommand(const MyString& inputValue)
 {
     return inputValue.front() == '=';
 }
 
-bool TableEntryFactory::isFalseCommand(const std::string& inputValue)
+bool TableEntryFactory::isFalseCommand(const MyString& inputValue)
 {
     size_t plusCount = 0;
     size_t minusCount = 0;
@@ -87,12 +87,12 @@ bool TableEntryFactory::isFalseCommand(const std::string& inputValue)
     return plusCount + minusCount + starCount + slashCount + powCount != 1;
 }
 
-bool TableEntryFactory::isTypeNull(const std::string& inputValue)
+bool TableEntryFactory::isTypeNull(const MyString& inputValue)
 {
     return inputValue.empty();
 }
 
-TableEntry* TableEntryFactory::createEntry(const std::string& inputValue)
+TableEntry* TableEntryFactory::createEntry(const MyString& inputValue)
 {
     if (isTypeNull(inputValue))
     {
@@ -100,7 +100,7 @@ TableEntry* TableEntryFactory::createEntry(const std::string& inputValue)
     }
     if (isString(inputValue))
     {
-        std::string stripped = inputValue.substr(1, inputValue.size() - 2);
+        MyString stripped = inputValue.substr(1, inputValue.size() - 2);
         if (stripped.size() > 1)
         {
             for (size_t i = 0; i < stripped.size() - 1; i++)

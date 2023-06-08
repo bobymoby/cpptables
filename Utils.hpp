@@ -3,6 +3,8 @@
 #include <fstream>
 #include <vector>
 
+#include "MyString/MyString.h"
+
 namespace Utils
 {
     size_t GetCharCount(std::ifstream& ifs, char ch);
@@ -10,10 +12,14 @@ namespace Utils
 
     size_t NumberLength(double number);
 
-    void lstrip(std::string& str, char toBeRemoved);
-    void rstrip(std::string& str, char toBeRemoved);
-    void strip(std::string& str, char toBeRemoved);
-    void split(const std::string& str, char delimiter, std::string& left, std::string& right);
+    void lstrip(MyString& str, char toBeRemoved);
+    void rstrip(MyString& str, char toBeRemoved);
+    void strip(MyString& str, char toBeRemoved);
+    void split(const MyString& str, char delimiter, MyString& left, MyString& right);
+
+    void strcpy(char* destination, const char* source);
+    void strcat(char* destination, const char* source);
+    size_t strlen(const char* str);
 
     template <typename T>
     bool contains(const std::vector<T>& vec, const T& element);

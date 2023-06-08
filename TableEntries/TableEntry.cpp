@@ -1,11 +1,11 @@
 #include "TableEntry.h"
 
-TableEntry::TableEntry(const std::string& inputValue)
+TableEntry::TableEntry(const MyString& inputValue)
 {
     this->inputValue = inputValue;
 }
 
-const std::string& TableEntry::getInputValue() const
+const MyString& TableEntry::getInputValue() const
 {
     return inputValue;
 }

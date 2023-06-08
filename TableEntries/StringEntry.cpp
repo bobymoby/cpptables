@@ -1,6 +1,6 @@
 #include "StringEntry.h"
 
-StringEntry::StringEntry(const std::string& inputValue) : TableEntry(inputValue)
+StringEntry::StringEntry(const MyString& inputValue) : TableEntry(inputValue)
 {
 }
 

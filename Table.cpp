@@ -14,11 +14,15 @@ void Table::copyFrom(const Table& other)
     {
         cols.push_back(new TableCol(*col));
     }
+    visited.clear();
+    filename = other.filename;
 }
 
 void Table::moveFrom(Table&& other)
 {
     cols = std::move(other.cols);
+    visited = std::move(other.visited);
+    filename = std::move(other.filename);
 }
 
 void Table::free()
@@ -29,7 +33,7 @@ void Table::free()
     }
 }
 
-void Table::addEntry(const std::string& entry, size_t colIndex, size_t rowIndex, size_t lineCount)
+void Table::addEntry(const MyString& entry, size_t colIndex, size_t rowIndex, size_t lineCount)
 {
     // Utils::strip(entry, ' ');
     while (colIndex >= cols.size())
@@ -107,7 +111,7 @@ void Table::execute(size_t colIndex, size_t rowIndex)
         if (cols[lcolIndex]->getCells()[lrowIndex]->getType() == EntryType::ERROR)
         {
             ErrorEntry* err = dynamic_cast<ErrorEntry*>(cols[lcolIndex]->getCells()[lrowIndex]);
-            std::string errorMsg = err->getErrorMsg() + " in R" + std::to_string(lcolIndex) + "C" + std::to_string(lrowIndex);
+            MyString errorMsg = err->getErrorMsg() + " in R" + std::to_string(lrowIndex) + "C" + std::to_string(lcolIndex);
             makeCellError(colIndex, rowIndex, errorMsg);
             visited.pop_back();
             return;
@@ -142,7 +146,7 @@ void Table::execute(size_t colIndex, size_t rowIndex)
         if (cols[rcolIndex]->getCells()[rrowIndex]->getType() == EntryType::ERROR)
         {
             ErrorEntry* err = dynamic_cast<ErrorEntry*>(cols[rcolIndex]->getCells()[rrowIndex]);
-            std::string errorMsg = err->getErrorMsg() + " in R" + std::to_string(rcolIndex) + "C" + std::to_string(rrowIndex);
+            MyString errorMsg = err->getErrorMsg() + " in R" + std::to_string(rrowIndex) + "C" + std::to_string(rcolIndex);
             makeCellError(colIndex, rowIndex, errorMsg);
             visited.pop_back();
             return;
@@ -187,7 +191,7 @@ void Table::execute(size_t colIndex, size_t rowIndex)
 
 }
 
-void Table::makeCellError(size_t colIndex, size_t rowIndex, const std::string& errorMsg)
+void Table::makeCellError(size_t colIndex, size_t rowIndex, const MyString& errorMsg)
 {
     TableEntry* currEntry = cols[colIndex]->getCells()[rowIndex];
     if (currEntry->getType() == EntryType::ERROR)
@@ -199,14 +203,14 @@ void Table::makeCellError(size_t colIndex, size_t rowIndex, const std::string& e
 
 void Table::printErrors() const
 {
-    for (size_t col = 0; col < cols.size(); col++)
+    for (size_t colIndex = 0; colIndex < cols.size(); colIndex++)
     {
-        for (size_t row = 0; row < cols[col]->getCells().size(); row++)
+        for (size_t rowIndex = 0; rowIndex < cols[colIndex]->getCells().size(); rowIndex++)
         {
-            if (cols[col]->getCells()[row]->getType() == EntryType::ERROR)
+            if (cols[colIndex]->getCells()[rowIndex]->getType() == EntryType::ERROR)
             {
-                ErrorEntry* error = (ErrorEntry*)(cols[col]->getCells()[row]);
-                std::cout << 'R' << row << 'C' << col << ": " << error->getErrorMsg() << std::endl;
+                ErrorEntry* error = (ErrorEntry*)(cols[colIndex]->getCells()[rowIndex]);
+                std::cout << 'R' << rowIndex << 'C' << colIndex << ": " << error->getErrorMsg() << std::endl;
             }
         }
     }
@@ -219,11 +223,11 @@ void Table::readInput(std::ifstream& in)
         throw std::runtime_error("File not open!");
     }
     size_t lineCount = Utils::GetLineCount(in);
-    std::string line;
+    MyString line;
     size_t rowIndex = 0;
     size_t startIndex = 0;
     size_t endIndex = 0;
-    while (std::getline(in, line))
+    while (line.getline(in))
     {
         startIndex = 0;
         endIndex = 0;
@@ -237,14 +241,14 @@ void Table::readInput(std::ifstream& in)
             }
             else if (line[endIndex] == ',' && !isString)
             {
-                std::string cell = line.substr(startIndex, endIndex - startIndex);
+                MyString cell = line.substr(startIndex, endIndex - startIndex);
                 addEntry(cell, colIndex, rowIndex, lineCount);
                 startIndex = endIndex + 1;
                 colIndex++;
             }
             endIndex++;
         }
-        std::string cell = line.substr(startIndex, endIndex - startIndex);
+        MyString cell = line.substr(startIndex, endIndex - startIndex);
         addEntry(cell, colIndex, rowIndex, lineCount);
         rowIndex++;
     }
@@ -254,10 +258,10 @@ Table::Table() : cols()
 {
 }
 
-Table::Table(const std::string& filename)
+Table::Table(const MyString& filename)
 {
     this->filename = filename;
-    std::ifstream file(filename);
+    std::ifstream file(filename.c_str());
 
     readInput(file);
 
@@ -312,9 +316,9 @@ Table::~Table()
     free();
 }
 
-void Table::read(const std::string& filename)
+void Table::read(const MyString& filename)
 {
-    std::ifstream file(filename);
+    std::ifstream file(filename.c_str());
 
     read(file);
 
@@ -336,9 +340,9 @@ void Table::save()
     save(filename);
 }
 
-void Table::save(const std::string& filename) const
+void Table::save(const MyString& filename) const
 {
-    std::ofstream file(filename);
+    std::ofstream file(filename.c_str());
     save(file);
     file.close();
 }
@@ -379,7 +383,7 @@ void Table::print() const
     std::cout << '+';
     for (size_t j = 0; j < cols.size(); j++)
     {
-        std::cout << std::string(cols[j]->getOutputWidth() + 2, '-');
+        std::cout << MyString(cols[j]->getOutputWidth() + 2, '-');
         std::cout << '+';
     }
     std::cout << std::endl;
@@ -388,15 +392,15 @@ void Table::print() const
         std::cout << "| ";
         for (const TableCol* col : cols)
         {
-            const std::string& output = col->getCells()[i]->getInputValue();
-            std::cout << output << std::string(col->getOutputWidth() - output.size() + 1, ' ');
+            const MyString& output = col->getCells()[i]->getInputValue();
+            std::cout << output << MyString(col->getOutputWidth() - output.size() + 1, ' ');
             std::cout << "| ";
         }
         std::cout << std::endl;
         std::cout << '+';
         for (size_t j = 0; j < cols.size(); j++)
         {
-            std::cout << std::string(cols[j]->getOutputWidth() + 2, '-');
+            std::cout << MyString(cols[j]->getOutputWidth() + 2, '-');
             std::cout << '+';
         }
         std::cout << std::endl;
@@ -413,7 +417,7 @@ void Table::printNumberValues() const
     std::cout << '+';
     for (size_t j = 0; j < cols.size(); j++)
     {
-        std::cout << std::string(cols[j]->getNumberWidth() + 2, '-');
+        std::cout << MyString(cols[j]->getNumberWidth() + 2, '-');
         std::cout << '+';
     }
     std::cout << std::endl;
@@ -430,8 +434,8 @@ void Table::printNumberValues() const
                 std::cout << std::fixed;
             }
             std::cout << output;
-            std::cout << std::string(col->getNumberWidth() - entry->getNumberWidth() + 1, ' ');
-            // std::cout << output << std::string(col->getNumberWidth() - entry->getNumberWidth() + 1, ' ');
+            std::cout << MyString(col->getNumberWidth() - entry->getNumberWidth() + 1, ' ');
+            // std::cout << output << MyString(col->getNumberWidth() - entry->getNumberWidth() + 1, ' ');
             std::cout << "| ";
 
             std::cout << std::setprecision(6);
@@ -442,7 +446,7 @@ void Table::printNumberValues() const
         std::cout << '+';
         for (size_t j = 0; j < cols.size(); j++)
         {
-            std::cout << std::string(cols[j]->getNumberWidth() + 2, '-');
+            std::cout << MyString(cols[j]->getNumberWidth() + 2, '-');
             std::cout << '+';
         }
         std::cout << std::endl;

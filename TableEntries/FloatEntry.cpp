@@ -1,9 +1,9 @@
 #include "FloatEntry.h"
 
-FloatEntry::FloatEntry(const std::string& inputValue) : TableEntry(inputValue)
+FloatEntry::FloatEntry(const MyString& inputValue) : TableEntry(inputValue)
 {
     size_t decimalPointIndex = inputValue.find('.');
-    if (decimalPointIndex != std::string::npos)
+    if (decimalPointIndex != MyString::npos)
     {
         decimalPlaces = getOutputWidth() - decimalPointIndex - 1;
     }
@@ -15,7 +15,7 @@ FloatEntry::FloatEntry(const std::string& inputValue) : TableEntry(inputValue)
 
 double FloatEntry::getNumberValue() const
 {
-    return std::stod(inputValue);
+    return std::stod(inputValue.c_str());
 }
 
 unsigned int FloatEntry::getNumberWidth() const

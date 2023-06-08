@@ -1,11 +1,11 @@
 #include "ErrorEntry.h"
 
-ErrorEntry::ErrorEntry(const std::string& value, const std::string& errorMsg) : TableEntry(value)
+ErrorEntry::ErrorEntry(const MyString& value, const MyString& errorMsg) : TableEntry(value)
 {
     this->errorMsg = errorMsg;
 }
 
-const std::string& ErrorEntry::getErrorMsg() const
+const MyString& ErrorEntry::getErrorMsg() const
 {
     return errorMsg;
 }

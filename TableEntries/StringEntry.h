@@ -5,7 +5,7 @@
 class StringEntry : public TableEntry
 {
 public:
-    StringEntry(const std::string& inputValue);
+    StringEntry(const MyString& inputValue);
 
     EntryType getType() const override;
     double getNumberValue() const override;

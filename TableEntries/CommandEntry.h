@@ -28,9 +28,9 @@ private:
     double rightNumberValue;
 
     void readCommand();
-    void readIndexes(std::string& str, bool isLeft);
+    void readIndexes(MyString& str, bool isLeft);
 public:
-    CommandEntry(const std::string& inputValue);
+    CommandEntry(const MyString& inputValue);
     void execute(double result);
     double getNumberValue() const override;
     unsigned int getNumberWidth() const override;

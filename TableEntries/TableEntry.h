@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "../MyString/MyString.h"
 
 enum class EntryType
 {
@@ -14,12 +15,12 @@ enum class EntryType
 class TableEntry
 {
 protected:
-    std::string inputValue;
+    MyString inputValue;
 
-    TableEntry(const std::string& inputValue);
+    TableEntry(const MyString& inputValue);
 
 public:
-    const std::string& getInputValue() const;
+    const MyString& getInputValue() const;
 
     virtual EntryType getType() const = 0;
     unsigned int getOutputWidth() const;

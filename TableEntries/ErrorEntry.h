@@ -5,11 +5,11 @@
 class ErrorEntry : public TableEntry
 {
 private:
-    std::string errorMsg;
+    MyString errorMsg;
 public:
-    ErrorEntry(const std::string& inputValue, const std::string& errorMsg);
+    ErrorEntry(const MyString& inputValue, const MyString& errorMsg);
 
-    const std::string& getErrorMsg() const;
+    const MyString& getErrorMsg() const;
 
     EntryType getType() const override;
     double getNumberValue() const override;
