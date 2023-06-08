@@ -300,6 +300,18 @@ bool MyString::getline(std::istream& is)
     return true;
 }
 
+// std::istream& operator>>(std::istream& is, MyString& str)
+// {
+//     char buffer[1024];
+//     is.getline(buffer, 1024);
+//     delete[] str._data;
+//     str._size = Utils::strlen(buffer);
+//     str._capacity = str._size + 1;
+//     str._data = new char[str._capacity];
+//     Utils::strcpy(str._data, buffer);
+//     return is;
+// }
+
 std::ostream& operator<<(std::ostream& os, const MyString& str)
 {
     os << str.c_str();

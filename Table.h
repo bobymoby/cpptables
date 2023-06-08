@@ -26,6 +26,8 @@ private:
 
     void readInput(std::ifstream& in);
 
+    bool parseCommandArg(size_t cColIndex, size_t cRowIndex, size_t colIndex, size_t rowIndex, double& result); //c = command - used for error messages
+
 public:
     Table();
     Table(const MyString& filename);
@@ -45,4 +47,8 @@ public:
 
     void print() const;
     void printNumberValues() const;
+
+    void setCell(size_t row, size_t col, const MyString& value);
+
+    const MyString& getFilename() const;
 };

@@ -63,6 +63,8 @@ public:
     bool operator!=(const MyString& other) const;
 
     bool getline(std::istream& is);
+
+    // friend std::istream& operator>>(std::istream& is, MyString& str);
 };
 
 std::ostream& operator<<(std::ostream& os, const MyString& str);

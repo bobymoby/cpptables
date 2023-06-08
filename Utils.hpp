@@ -21,6 +21,7 @@ namespace Utils
     void strcpy(char* destination, const char* source);
     void strcat(char* destination, const char* source);
     size_t strlen(const char* str);
+    int strcmp(const char* str1, const char* str2);
 
     template <typename T>
     bool contains(const MyVector<T>& vec, const T& element);

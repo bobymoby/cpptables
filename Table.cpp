@@ -14,7 +14,7 @@ void Table::copyFrom(const Table& other)
     {
         cols.push_back(new TableCol(*col));
     }
-    visited.clear();
+    visited = MyVector<const TableEntry*>();
     filename = other.filename;
 }
 
@@ -83,40 +83,14 @@ void Table::execute(size_t colIndex, size_t rowIndex)
     double result = 0;
     double lvalue = 0;
     double rvalue = 0;
-    size_t lcolIndex;
-    size_t lrowIndex;
-    size_t rcolIndex;
-    size_t rrowIndex;
 
     if (command->getIsLeftCell())
     {
-        lcolIndex = command->getLCIndex();
-        lrowIndex = command->getLRIndex();
-        if (lcolIndex == colIndex && lrowIndex == rowIndex)
+        if (parseCommandArg(colIndex, rowIndex, command->getLCIndex(), command->getLRIndex(), lvalue))
         {
-            makeCellError(colIndex, rowIndex, "Self reference");
             visited.pop_back();
             return;
         }
-        if (lcolIndex >= cols.size() || lrowIndex >= cols[lcolIndex]->getCells().size())
-        {
-            makeCellError(colIndex, rowIndex, "Invalid reference");
-            visited.pop_back();
-            return;
-        }
-        if (cols[lcolIndex]->getCells()[lrowIndex]->getType() == EntryType::COMMAND)
-        {
-            execute(lcolIndex, lrowIndex);
-        }
-        if (cols[lcolIndex]->getCells()[lrowIndex]->getType() == EntryType::ERROR)
-        {
-            ErrorEntry* err = dynamic_cast<ErrorEntry*>(cols[lcolIndex]->getCells()[lrowIndex]);
-            MyString errorMsg = err->getErrorMsg() + " in R" + std::to_string(lrowIndex) + "C" + std::to_string(lcolIndex);
-            makeCellError(colIndex, rowIndex, errorMsg);
-            visited.pop_back();
-            return;
-        }
-        lvalue = cols[lcolIndex]->getCells()[lrowIndex]->getNumberValue();
     }
     else
     {
@@ -125,33 +99,11 @@ void Table::execute(size_t colIndex, size_t rowIndex)
 
     if (command->getIsRightCell())
     {
-        rcolIndex = command->getRCIndex();
-        rrowIndex = command->getRRIndex();
-        if (rcolIndex == colIndex && rrowIndex == rowIndex)
+        if (parseCommandArg(colIndex, rowIndex, command->getRCIndex(), command->getRRIndex(), rvalue))
         {
-            makeCellError(colIndex, rowIndex, "Self reference");
             visited.pop_back();
             return;
         }
-        if (rcolIndex >= cols.size() || rrowIndex >= cols[rcolIndex]->getCells().size())
-        {
-            makeCellError(colIndex, rowIndex, "Invalid reference");
-            visited.pop_back();
-            return;
-        }
-        if (cols[rcolIndex]->getCells()[rrowIndex]->getType() == EntryType::COMMAND)
-        {
-            execute(rcolIndex, rrowIndex);
-        }
-        if (cols[rcolIndex]->getCells()[rrowIndex]->getType() == EntryType::ERROR)
-        {
-            ErrorEntry* err = dynamic_cast<ErrorEntry*>(cols[rcolIndex]->getCells()[rrowIndex]);
-            MyString errorMsg = err->getErrorMsg() + " in R" + std::to_string(rrowIndex) + "C" + std::to_string(rcolIndex);
-            makeCellError(colIndex, rowIndex, errorMsg);
-            visited.pop_back();
-            return;
-        }
-        rvalue = cols[rcolIndex]->getCells()[rrowIndex]->getNumberValue();
     }
     else
     {
@@ -254,7 +206,34 @@ void Table::readInput(std::ifstream& in)
     }
 }
 
-Table::Table() : cols()
+bool Table::parseCommandArg(size_t cColIndex, size_t cRowIndex, size_t colIndex, size_t rowIndex, double& result)
+{
+    if (colIndex == cColIndex && rowIndex == cRowIndex)
+    {
+        makeCellError(cColIndex, cRowIndex, "Self reference");
+        return false;
+    }
+    if (colIndex >= cols.size() || rowIndex >= cols[colIndex]->getCells().size())
+    {
+        makeCellError(cColIndex, cRowIndex, "Invalid reference");
+        return false;
+    }
+    if (cols[colIndex]->getCells()[rowIndex]->getType() == EntryType::COMMAND)
+    {
+        execute(colIndex, rowIndex);
+    }
+    if (cols[colIndex]->getCells()[rowIndex]->getType() == EntryType::ERROR)
+    {
+        ErrorEntry* err = dynamic_cast<ErrorEntry*>(cols[colIndex]->getCells()[rowIndex]);
+        MyString errorMsg = err->getErrorMsg() + " in R" + std::to_string(rowIndex) + "C" + std::to_string(colIndex);
+        makeCellError(cColIndex, cRowIndex, errorMsg);
+        return false;
+    }
+    result = cols[colIndex]->getCells()[rowIndex]->getNumberValue();
+    return true;
+}
+
+Table::Table() : cols(), filename(), visited()
 {
 }
 
@@ -451,4 +430,19 @@ void Table::printNumberValues() const
         }
         std::cout << std::endl;
     }
+}
+
+void Table::setCell(size_t row, size_t col, const MyString& value)
+{
+    if (row >= cols[0]->getCells().size() || col >= cols.size())
+    {
+        throw std::out_of_range("Invalid row or column");
+    }
+    TableEntry* cell = TableEntryFactory::createEntry(value);
+    cols[col]->setCell(row, cell);
+}
+
+const MyString& Table::getFilename() const
+{
+    return filename;
 }
