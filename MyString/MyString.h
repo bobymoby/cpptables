@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <string>
 
 class MyString
 {
@@ -25,7 +24,8 @@ public:
     MyString(char c);
     MyString(size_t count, char c);
     MyString(const char* str);
-    MyString(const std::string& str);
+
+    static MyString fromInt(long long number);
 
     MyString();
     MyString(const MyString& other);

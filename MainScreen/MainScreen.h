@@ -9,6 +9,7 @@ private:
     bool usingDynamicTable;
 
     bool isTableOpen() const;
+    void resetTable();
 
 public:
     MainScreen();

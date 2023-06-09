@@ -28,13 +28,13 @@ unsigned int CommandEntry::getNumberWidth() const
     int fract = (int)((numberValue - whole) * 100);
     if (fract == 0)
     {
-        return std::to_string(whole).size();
+        return MyString::fromInt(whole).size();
     }
     if (fract == 1)
     {
-        return std::to_string(whole).size() + 2;
+        return MyString::fromInt(whole).size() + 2;
     }
-    return std::to_string(whole).size() + 3;
+    return MyString::fromInt(whole).size() + 3;
 }
 
 EntryType CommandEntry::getType() const
@@ -91,7 +91,7 @@ void CommandEntry::readCommand()
         isLeftCell = false;
         try
         {
-            leftNumberValue = std::stod(lside.c_str());
+            leftNumberValue = Utils::stod(lside.c_str());
         }
         catch (const std::exception&)
         {
@@ -109,7 +109,7 @@ void CommandEntry::readCommand()
         isRightCell = false;
         try
         {
-            rightNumberValue = std::stod(rside.c_str());
+            rightNumberValue = Utils::stod(rside.c_str());
         }
         catch (const std::exception&)
         {
@@ -188,9 +188,9 @@ void CommandEntry::readIndexes(MyString& str, bool isLeft)
     {
         index++;
     }
-    size_t rowIndex = std::stoi(str.substr(startIndex, index - startIndex).c_str());
+    size_t rowIndex = Utils::stoi(str.substr(startIndex, index - startIndex).c_str());
     index++;
-    size_t colIndex = std::stoi(str.substr(index).c_str());
+    size_t colIndex = Utils::stoi(str.substr(index).c_str());
 
     if (isLeft)
     {

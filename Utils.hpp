@@ -1,7 +1,6 @@
 #pragma once
 
 #include <fstream>
-#include <vector>
 
 #include "MyString/MyString.h"
 #include "MyVector/MyVector.hpp"
@@ -11,7 +10,10 @@ namespace Utils
     size_t GetCharCount(std::ifstream& ifs, char ch);
     size_t GetLineCount(std::ifstream& ifs);
 
-    size_t NumberLength(double number);
+    size_t numlen(long long number);
+    void itoa(long long number, char* buffer);
+    long long stoi(const char* str);
+    double stod(const char* str);
 
     void lstrip(MyString& str, char toBeRemoved);
     void rstrip(MyString& str, char toBeRemoved);
@@ -22,6 +24,8 @@ namespace Utils
     void strcat(char* destination, const char* source);
     size_t strlen(const char* str);
     int strcmp(const char* str1, const char* str2);
+
+    void reverse(char* str);
 
     template <typename T>
     bool contains(const MyVector<T>& vec, const T& element);

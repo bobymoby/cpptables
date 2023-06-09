@@ -1,4 +1,6 @@
 #include "IntegerEntry.h"
+#include "../Utils.hpp"
+
 
 IntegerEntry::IntegerEntry(const MyString& inputValue) : TableEntry(inputValue)
 {
@@ -6,7 +8,7 @@ IntegerEntry::IntegerEntry(const MyString& inputValue) : TableEntry(inputValue)
 
 double IntegerEntry::getNumberValue() const
 {
-    return std::stod(inputValue.c_str());
+    return Utils::stod(inputValue.c_str());
 }
 
 unsigned int IntegerEntry::getNumberWidth() const

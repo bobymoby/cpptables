@@ -1,4 +1,6 @@
 #include "FloatEntry.h"
+#include "../Utils.hpp"
+
 
 FloatEntry::FloatEntry(const MyString& inputValue) : TableEntry(inputValue)
 {
@@ -15,7 +17,7 @@ FloatEntry::FloatEntry(const MyString& inputValue) : TableEntry(inputValue)
 
 double FloatEntry::getNumberValue() const
 {
-    return std::stod(inputValue.c_str());
+    return Utils::stod(inputValue.c_str());
 }
 
 unsigned int FloatEntry::getNumberWidth() const

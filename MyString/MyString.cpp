@@ -76,12 +76,14 @@ MyString::MyString(const char* str)
     Utils::strcpy(_data, str);
 }
 
-MyString::MyString(const std::string& str)
+MyString MyString::fromInt(long long number)
 {
-    _size = str.size();
-    _capacity = _size + 1;
-    _data = new char[_capacity];
-    Utils::strcpy(_data, str.c_str());
+    MyString result;
+    result._size = Utils::numlen(number);
+    result._capacity = result._size + 1;
+    result._data = new char[result._capacity];
+    Utils::itoa(number, result._data);
+    return result;
 }
 
 MyString::MyString()

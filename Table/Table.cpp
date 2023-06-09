@@ -6,8 +6,8 @@
 #include "../Utils.hpp"
 
 #include <iostream>
-#include <cmath>
-#include <iomanip>
+#include <cmath> // for real powers
+#include <iomanip> // std::setprecision std::setfixed std::defaultfloat
 
 void Table::copyFrom(const Table& other)
 {
@@ -135,7 +135,6 @@ void Table::execute(size_t colIndex, size_t rowIndex)
         rvalue = command->getRNumberValue();
     }
 
-
     switch (command->getOperation())
     {
     case Operation::ADD:
@@ -250,7 +249,7 @@ bool Table::parseCommandArg(size_t cColIndex, size_t cRowIndex, size_t colIndex,
     if (cols[colIndex]->getCells()[rowIndex]->getType() == EntryType::ERROR)
     {
         ErrorEntry* err = dynamic_cast<ErrorEntry*>(cols[colIndex]->getCells()[rowIndex]);
-        MyString errorMsg = err->getErrorMsg() + " in R" + std::to_string(rowIndex) + "C" + std::to_string(colIndex);
+        MyString errorMsg = err->getErrorMsg() + " in R" + MyString::fromInt(rowIndex) + "C" + MyString::fromInt(colIndex);
         makeCellError(cColIndex, cRowIndex, errorMsg);
         return false;
     }
@@ -276,7 +275,7 @@ Table::Table(const MyString& filename)
 
 Table::Table(std::ifstream& in)
 {
-    this->filename = in.getloc().name();
+    this->filename = in.getloc().name().c_str();
     readInput(in);
     executeAll();
 }
@@ -327,7 +326,7 @@ void Table::read(const MyString& filename)
 
 void Table::read(std::ifstream& in)
 {
-    this->filename = in.getloc().name();
+    this->filename = in.getloc().name().c_str();
 
     free();
 
@@ -386,6 +385,10 @@ void Table::save(std::ofstream& out) const
             {
                 out << ',';
             }
+        }
+        if (rowIndex + 1 != cols[0]->getCells().size())
+        {
+            out << std::endl;
         }
     }
 }
@@ -478,18 +481,18 @@ void Table::printTypes() const
         return;
     }
     std::cout << '+';
-    for (size_t j = 0; j < cols[0]->getCells().size(); j++)
+    for (size_t i = 0; i < cols.size(); i++)
     {
         std::cout << MyString(9, '-');
         std::cout << '+';
     }
     std::cout << std::endl;
-    for (size_t j = 0; j < cols[0]->getCells().size(); j++)
+    for (size_t rowIndex = 0; rowIndex < cols[0]->getCells().size(); rowIndex++)
     {
         std::cout << "|";
-        for (size_t i = 0; i < cols.size(); i++)
+        for (size_t colIndex = 0; colIndex < cols.size(); colIndex++)
         {
-            type = cols[i]->getCells()[j]->getType();
+            type = cols[colIndex]->getCells()[rowIndex]->getType();
             switch (type)
             {
             case EntryType::STRING:
@@ -513,7 +516,7 @@ void Table::printTypes() const
         }
         std::cout << std::endl;
         std::cout << '+';
-        for (size_t j = 0; j < cols[0]->getCells().size(); j++)
+        for (size_t i = 0; i < cols.size(); i++)
         {
             std::cout << MyString(9, '-');
             std::cout << '+';

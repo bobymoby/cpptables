@@ -8,9 +8,16 @@ bool MainScreen::isTableOpen() const
     return usingDynamicTable || _table.getFilename().size() > 0;
 }
 
-MainScreen::MainScreen() : _table(), usingDynamicTable(true)
+void MainScreen::resetTable()
 {
+    _table = Table();
     _table.addCol();
+    usingDynamicTable = true;
+}
+
+MainScreen::MainScreen()
+{
+    resetTable();
 }
 
 void MainScreen::run()
@@ -114,6 +121,10 @@ void MainScreen::run()
         {
             _table.addCol();
         }
+        else if (Utils::strcmp(commandStr, "reset") == 0)
+        {
+            resetTable();
+        }
         else if (Utils::strcmp(commandStr, "help") == 0)
         {
             std::cout << "exit - exits the program" << std::endl;
@@ -123,8 +134,9 @@ void MainScreen::run()
             std::cout << "printInput - prints the input table" << std::endl;
             std::cout << "printTypes - prints the types of the cells" << std::endl;
             std::cout << "setcell - sets a cell value" << std::endl;
-            std::cout << "addrow - adds a row" << std::endl;
-            std::cout << "addcol - adds a column" << std::endl;
+            std::cout << "addrow - adds a row full of null values to the bottom" << std::endl;
+            std::cout << "addcol - adds a column full of null values to the right" << std::endl;
+            std::cout << "reset - resets the table(sets it to 1 by 1 table with a null entry)" << std::endl;
             std::cout << "help - prints this message" << std::endl;
         }
         else

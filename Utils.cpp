@@ -1,5 +1,4 @@
 #include "Utils.hpp"
-#include <string>
 
 size_t Utils::GetCharCount(std::ifstream& ifs, char ch)
 {
@@ -34,9 +33,111 @@ size_t Utils::GetLineCount(std::ifstream& ifs)
     return GetCharCount(ifs, '\n') + 1;
 }
 
-size_t Utils::NumberLength(double number)
+size_t Utils::numlen(long long number)
 {
-    return 10;
+    if (number == 0)
+    {
+        return 1;
+    }
+    size_t length = 0;
+    if (number < 0)
+    {
+        length++;
+    }
+    while (number != 0)
+    {
+        number /= 10;
+        length++;
+    }
+    return length;
+}
+
+void Utils::itoa(long long number, char* buffer)
+{
+    if (number == 0)
+    {
+        buffer[0] = '0';
+        buffer[1] = '\0';
+        return;
+    }
+    size_t index = 0;
+    bool isNegative = false;
+    if (number < 0)
+    {
+        buffer[index] = '-';
+        number *= -1;
+        isNegative = true;
+    }
+    while (number > 0)
+    {
+        buffer[index] = number % 10 + '0';
+        number /= 10;
+        index++;
+    }
+    if (isNegative)
+    {
+        buffer[index] = '-';
+        index++;
+    }
+    buffer[index] = '\0';
+    reverse(buffer);
+}
+
+long long Utils::stoi(const char* str)
+{
+    long long result = 0;
+    size_t index = 0;
+    bool isNegative = false;
+    if (str[0] == '-')
+    {
+        isNegative = true;
+        index++;
+    }
+    while (str[index] != '\0')
+    {
+        result *= 10;
+        result += str[index] - '0';
+        index++;
+    }
+    if (isNegative)
+    {
+        result *= -1;
+    }
+    return result;
+}
+
+double Utils::stod(const char* str)
+{
+    double result = 0;
+    size_t index = 0;
+    bool isNegative = false;
+    if (str[0] == '-')
+    {
+        isNegative = true;
+        index++;
+    }
+    while (str[index] != '\0' && str[index] != '.')
+    {
+        result *= 10;
+        result += str[index] - '0';
+        index++;
+    }
+    if (str[index] == '.')
+    {
+        index++;
+        double power = 1;
+        while (str[index] != '\0')
+        {
+            power /= 10;
+            result += (str[index] - '0') * power;
+            index++;
+        }
+    }
+    if (isNegative)
+    {
+        result *= -1;
+    }
+    return result;
 }
 
 void Utils::lstrip(MyString& str, char toBeRemoved)
@@ -140,4 +241,15 @@ int Utils::strcmp(const char* str1, const char* str2)
         return -1;
     }
     return 1;
+}
+
+void Utils::reverse(char* str)
+{
+    size_t length = strlen(str);
+    for (size_t i = 0; i < length / 2; i++)
+    {
+        char temp = str[i];
+        str[i] = str[length - i - 1];
+        str[length - i - 1] = temp;
+    }
 }
