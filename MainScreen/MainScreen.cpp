@@ -10,6 +10,7 @@ bool MainScreen::isTableOpen() const
 
 MainScreen::MainScreen() : _table(), usingDynamicTable(true)
 {
+    _table.addCol();
 }
 
 void MainScreen::run()

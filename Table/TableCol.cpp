@@ -1,7 +1,7 @@
 #include "TableCol.h"
-#include "TableEntryFactory/TableEntryFactory.h"
+#include "../TableEntryFactory/TableEntryFactory.h"
+#include "../TableEntries/TypeNullEntry.h"
 
-#include "TableEntries/TypeNullEntry.h"
 #include <iostream>
 
 

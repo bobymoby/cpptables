@@ -1,10 +1,8 @@
 #pragma once
 
-#include <vector>
-
-#include "TableEntries/TableEntry.h"
-#include "TableEntries/CommandEntry.h"
-#include "MyVector/MyVector.hpp"
+#include "../TableEntries/TableEntry.h"
+#include "../TableEntries/CommandEntry.h"
+#include "../MyVector/MyVector.hpp"
 
 class TableCol
 {

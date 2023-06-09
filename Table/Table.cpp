@@ -1,9 +1,9 @@
 #include "Table.h"
-#include "TableEntryFactory/TableEntryFactory.h"
-#include "TableEntries/ErrorEntry.h"
-#include "TableEntries/FloatEntry.h"
-#include "TableEntries/TypeNullEntry.h"
-#include "Utils.hpp"
+#include "../TableEntryFactory/TableEntryFactory.h"
+#include "../TableEntries/ErrorEntry.h"
+#include "../TableEntries/FloatEntry.h"
+#include "../TableEntries/TypeNullEntry.h"
+#include "../Utils.hpp"
 
 #include <iostream>
 #include <cmath>
@@ -539,6 +539,7 @@ void Table::addCol()
     if (cols.empty())
     {
         cols.push_back(new TableCol(1));
+        cols[0]->setCell(0, new TypeNullEntry());
         return;
     }
     cols.push_back(new TableCol(cols[0]->getCells().size()));
