@@ -1,5 +1,7 @@
 #include "Utils.hpp"
 
+#include <string>
+
 size_t Utils::GetCharCount(std::ifstream& ifs, char ch)
 {
     size_t currentPosition = ifs.tellg();
@@ -31,6 +33,11 @@ size_t Utils::GetLineCount(std::ifstream& ifs)
         return 0;
 
     return GetCharCount(ifs, '\n') + 1;
+}
+
+bool Utils::isInt(double number)
+{
+    return number == (int)number;
 }
 
 size_t Utils::numlen(long long number)
@@ -136,6 +143,17 @@ double Utils::stod(const char* str)
     if (isNegative)
     {
         result *= -1;
+    }
+    return result;
+}
+
+MyString Utils::dtoa(double number)
+{
+    MyString result = std::to_string(number);
+    rstrip(result, '0');
+    if (result.back() == '.')
+    {
+        result = result.substr(0, result.size() - 1);
     }
     return result;
 }

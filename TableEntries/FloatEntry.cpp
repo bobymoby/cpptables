@@ -1,7 +1,6 @@
 #include "FloatEntry.h"
 #include "../Utils.hpp"
 
-
 FloatEntry::FloatEntry(const MyString& inputValue) : TableEntry(inputValue)
 {
     size_t decimalPointIndex = inputValue.find('.');

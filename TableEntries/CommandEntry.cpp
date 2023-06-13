@@ -5,36 +5,42 @@
 
 CommandEntry::CommandEntry(const MyString& inputValue) : TableEntry(inputValue)
 {
-    numberValue = 0;
-    executed = false;
-
-    readCommand();
+    reset();
+    parseCommand();
 }
 
 void CommandEntry::execute(double result)
 {
     executed = true;
-    numberValue = result;
+    MyString resultStr = Utils::dtoa(result);
+    output = FloatEntry(resultStr);
 }
 
 double CommandEntry::getNumberValue() const
 {
-    return numberValue;
+    if (executed)
+    {
+        return output.getNumberValue();
+    }
+    return 0;
 }
 
 unsigned int CommandEntry::getNumberWidth() const
 {
-    int whole = (int)numberValue;
-    int fract = (int)((numberValue - whole) * 100);
-    if (fract == 0)
+    if (executed)
     {
-        return MyString::fromInt(whole).size();
+        return output.getNumberWidth();
     }
-    if (fract == 1)
+    return 1;
+}
+
+unsigned int CommandEntry::getDecimalPlaces() const
+{
+    if (executed)
     {
-        return MyString::fromInt(whole).size() + 2;
+        return output.getDecimalPlaces();
     }
-    return MyString::fromInt(whole).size() + 3;
+    return 0;
 }
 
 EntryType CommandEntry::getType() const
@@ -42,7 +48,7 @@ EntryType CommandEntry::getType() const
     return EntryType::COMMAND;
 }
 
-void CommandEntry::readCommand()
+void CommandEntry::parseCommand()
 {
     MyString inputStr = inputValue.substr(1);
 
@@ -176,7 +182,7 @@ bool CommandEntry::hasExecuted() const
 void CommandEntry::reset()
 {
     executed = false;
-    numberValue = 0;
+    output = FloatEntry();
 }
 
 void CommandEntry::readIndexes(MyString& str, bool isLeft)

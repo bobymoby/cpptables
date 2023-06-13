@@ -7,6 +7,7 @@ class FloatEntry : public TableEntry
 private:
     unsigned int decimalPlaces;
 public:
+    FloatEntry() = default;
     FloatEntry(const MyString& inputValue);
     double getNumberValue() const override;
     unsigned int getNumberWidth() const override;

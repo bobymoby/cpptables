@@ -28,7 +28,7 @@ private:
     bool parseCommandArg(size_t cColIndex, size_t cRowIndex, size_t colIndex, size_t rowIndex, double& result); //c = command - used for error messages
 
 public:
-    Table();
+    Table() = default;
     Table(const MyString& filename);
     Table(std::ifstream& in);
     Table(const Table& other);

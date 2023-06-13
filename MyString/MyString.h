@@ -24,6 +24,7 @@ public:
     MyString(char c);
     MyString(size_t count, char c);
     MyString(const char* str);
+    MyString(const std::string& str); //used for conversion from double to string using std::to_string
 
     static MyString fromInt(long long number);
 

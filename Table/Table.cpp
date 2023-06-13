@@ -56,13 +56,13 @@ void Table::executeAll()
             currEntry = cols[colIndex]->getCells()[rowIndex];
             if (currEntry->getType() == EntryType::ERROR)
             {
-                ErrorEntry* error = dynamic_cast<ErrorEntry*>(currEntry);
+                ErrorEntry* error = (ErrorEntry*)currEntry;
                 TableEntry* newEntry = TableEntryFactory::createEntry(error->getInputValue());
                 cols[colIndex]->setCell(rowIndex, newEntry);
             }
             else if (currEntry->getType() == EntryType::COMMAND)
             {
-                CommandEntry* command = dynamic_cast<CommandEntry*>(currEntry);
+                CommandEntry* command = (CommandEntry*)(currEntry);
                 command->reset();
             }
 
@@ -248,17 +248,13 @@ bool Table::parseCommandArg(size_t cColIndex, size_t cRowIndex, size_t colIndex,
     }
     if (cols[colIndex]->getCells()[rowIndex]->getType() == EntryType::ERROR)
     {
-        ErrorEntry* err = dynamic_cast<ErrorEntry*>(cols[colIndex]->getCells()[rowIndex]);
+        ErrorEntry* err = (ErrorEntry*)(cols[colIndex]->getCells()[rowIndex]);
         MyString errorMsg = err->getErrorMsg() + " in R" + MyString::fromInt(rowIndex) + "C" + MyString::fromInt(colIndex);
         makeCellError(cColIndex, cRowIndex, errorMsg);
         return false;
     }
     result = cols[colIndex]->getCells()[rowIndex]->getNumberValue();
     return true;
-}
-
-Table::Table() : cols(), filename(), visited()
-{
 }
 
 Table::Table(const MyString& filename)
@@ -448,10 +444,20 @@ void Table::printNumberValues() const
         {
             TableEntry* entry = col->getCells()[i];
             double output = entry->getNumberValue();
-            if (entry->getType() == EntryType::FLOAT)
+            EntryType type = entry->getType();
+            if (type == EntryType::FLOAT)
             {
                 std::cout << std::setprecision(((FloatEntry*)entry)->getDecimalPlaces());
                 std::cout << std::fixed;
+            }
+            else if (type == EntryType::COMMAND)
+            {
+                const CommandEntry* command = (CommandEntry*)entry;
+                if (command->hasExecuted())
+                {
+                    std::cout << std::setprecision(command->getDecimalPlaces());
+                    std::cout << std::fixed;
+                }
             }
             std::cout << output;
             std::cout << MyString(col->getNumberWidth() - entry->getNumberWidth() + 1, ' ');

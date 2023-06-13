@@ -16,9 +16,11 @@ class TableEntry
 protected:
     MyString inputValue;
 
-    TableEntry(const MyString& inputValue);
 
 public:
+    TableEntry(const MyString& inputValue);
+    TableEntry() = default;
+
     const MyString& getInputValue() const;
 
     virtual EntryType getType() const = 0;

@@ -76,6 +76,14 @@ MyString::MyString(const char* str)
     Utils::strcpy(_data, str);
 }
 
+MyString::MyString(const std::string& str)
+{
+    _size = str.size();
+    _capacity = _size + 1;
+    _data = new char[_capacity];
+    Utils::strcpy(_data, str.c_str());
+}
+
 MyString MyString::fromInt(long long number)
 {
     MyString result;

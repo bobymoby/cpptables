@@ -10,10 +10,13 @@ namespace Utils
     size_t GetCharCount(std::ifstream& ifs, char ch);
     size_t GetLineCount(std::ifstream& ifs);
 
+    bool isInt(double number);
+
     size_t numlen(long long number);
     void itoa(long long number, char* buffer);
     long long stoi(const char* str);
     double stod(const char* str);
+    MyString dtoa(double number);
 
     void lstrip(MyString& str, char toBeRemoved);
     void rstrip(MyString& str, char toBeRemoved);
