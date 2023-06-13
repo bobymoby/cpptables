@@ -32,6 +32,9 @@ namespace Utils
 
     template <typename T>
     bool contains(const MyVector<T>& vec, const T& element);
+
+    void setFloatPrecision(size_t precision);
+    void resetFloatPrecision();
 };
 
 template <typename T>

@@ -1,6 +1,8 @@
 #include "Utils.hpp"
 
 #include <string>
+#include <iostream>
+#include <iomanip>
 
 size_t Utils::GetCharCount(std::ifstream& ifs, char ch)
 {
@@ -270,4 +272,16 @@ void Utils::reverse(char* str)
         str[i] = str[length - i - 1];
         str[length - i - 1] = temp;
     }
+}
+
+void Utils::resetFloatPrecision()
+{
+    std::cout << std::setprecision(6);
+    std::cout << std::defaultfloat;
+}
+
+void Utils::setFloatPrecision(size_t precision)
+{
+    std::cout << std::setprecision(precision);
+    std::cout << std::fixed;
 }

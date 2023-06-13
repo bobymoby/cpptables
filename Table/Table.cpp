@@ -6,12 +6,11 @@
 #include "../Utils.hpp"
 
 #include <iostream>
-#include <cmath> // for real powers
-#include <iomanip> // std::setprecision std::setfixed std::defaultfloat
+#include <cmath> // real number powers
 
 void Table::copyFrom(const Table& other)
 {
-    for (TableCol* col : other.cols)
+    for (const TableCol* col : other.cols)
     {
         cols.push_back(new TableCol(*col));
     }
@@ -28,7 +27,7 @@ void Table::moveFrom(Table&& other)
 
 void Table::free()
 {
-    for (TableCol* col : cols)
+    for (const TableCol* col : cols)
     {
         delete col;
     }
@@ -36,7 +35,6 @@ void Table::free()
 
 void Table::addEntry(const MyString& entry, size_t colIndex, size_t rowIndex, size_t lineCount)
 {
-    // Utils::strip(entry, ' ');
     while (colIndex >= cols.size())
     {
         cols.push_back(new TableCol(lineCount));
@@ -49,6 +47,9 @@ void Table::executeAll()
     //reset errors
     visited.clear();
     TableEntry* currEntry;
+    TableEntry* newEntry;
+    const ErrorEntry* error;
+    CommandEntry* command;
     for (size_t colIndex = 0; colIndex < cols.size(); colIndex++)
     {
         for (size_t rowIndex = 0; rowIndex < cols[colIndex]->getCells().size(); rowIndex++)
@@ -56,18 +57,19 @@ void Table::executeAll()
             currEntry = cols[colIndex]->getCells()[rowIndex];
             if (currEntry->getType() == EntryType::ERROR)
             {
-                ErrorEntry* error = (ErrorEntry*)currEntry;
-                TableEntry* newEntry = TableEntryFactory::createEntry(error->getInputValue());
+                error = (ErrorEntry*)currEntry;
+                newEntry = TableEntryFactory::createEntry(error->getInputValue());
                 cols[colIndex]->setCell(rowIndex, newEntry);
             }
             else if (currEntry->getType() == EntryType::COMMAND)
             {
-                CommandEntry* command = (CommandEntry*)(currEntry);
+                command = (CommandEntry*)currEntry;
                 command->reset();
             }
 
         }
     }
+
     for (size_t colIndex = 0; colIndex < cols.size(); colIndex++)
     {
         for (size_t rowIndex = 0; rowIndex < cols[colIndex]->getCells().size(); rowIndex++)
@@ -90,7 +92,7 @@ void Table::executeAll()
 void Table::execute(size_t colIndex, size_t rowIndex)
 {
     TableEntry* currEntry = cols[colIndex]->getCells()[rowIndex];
-    CommandEntry* command = dynamic_cast<CommandEntry*>(currEntry);
+    CommandEntry* command = (CommandEntry*)currEntry;
 
     if (command->hasExecuted())
     {
@@ -332,6 +334,10 @@ void Table::read(std::ifstream& in)
 
 void Table::save()
 {
+    if (filename.empty())
+    {
+        throw std::runtime_error("No filename specified");
+    }
     save(filename);
 }
 
@@ -353,12 +359,12 @@ void Table::save(std::ofstream& out) const
     {
         return;
     }
-
+    TableEntry* entry;
     for (size_t rowIndex = 0; rowIndex < cols[0]->getCells().size(); rowIndex++)
     {
         for (size_t colIndex = 0; colIndex < cols.size(); colIndex++)
         {
-            TableEntry* entry = cols[colIndex]->getCells()[rowIndex];
+            entry = cols[colIndex]->getCells()[rowIndex];
             if (entry->getType() == EntryType::STRING)
             {
                 out << '"';
@@ -433,7 +439,7 @@ void Table::printNumberValues() const
     std::cout << '+';
     for (size_t j = 0; j < cols.size(); j++)
     {
-        std::cout << MyString(cols[j]->getNumberWidth() + 2, '-');
+        std::cout << MyString(cols[j]->getNumberWidth() + 2, '-'); // +2 for the spaces around the number
         std::cout << '+';
     }
     std::cout << std::endl;
@@ -447,24 +453,21 @@ void Table::printNumberValues() const
             EntryType type = entry->getType();
             if (type == EntryType::FLOAT)
             {
-                std::cout << std::setprecision(((FloatEntry*)entry)->getDecimalPlaces());
-                std::cout << std::fixed;
+                Utils::setFloatPrecision(((FloatEntry*)entry)->getDecimalPlaces());
             }
             else if (type == EntryType::COMMAND)
             {
                 const CommandEntry* command = (CommandEntry*)entry;
                 if (command->hasExecuted())
                 {
-                    std::cout << std::setprecision(command->getDecimalPlaces());
-                    std::cout << std::fixed;
+                    Utils::setFloatPrecision(command->getDecimalPlaces());
                 }
             }
             std::cout << output;
             std::cout << MyString(col->getNumberWidth() - entry->getNumberWidth() + 1, ' ');
             std::cout << "| ";
 
-            std::cout << std::setprecision(6);
-            std::cout << std::defaultfloat;
+            Utils::resetFloatPrecision();
 
         }
         std::cout << std::endl;
