@@ -5,6 +5,7 @@
 class TypeNullEntry : public TableEntry
 {
 public:
+
     TypeNullEntry();
 
     EntryType getType() const override;
@@ -12,4 +13,5 @@ public:
     unsigned int getNumberWidth() const override;
 
     TableEntry* clone() const override;
+
 };

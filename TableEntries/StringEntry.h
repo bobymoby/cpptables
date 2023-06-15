@@ -5,6 +5,7 @@
 class StringEntry : public TableEntry
 {
 public:
+
     StringEntry(const MyString& inputValue);
 
     EntryType getType() const override;
@@ -12,4 +13,5 @@ public:
     unsigned int getNumberWidth() const override;
 
     TableEntry* clone() const override;
+
 };

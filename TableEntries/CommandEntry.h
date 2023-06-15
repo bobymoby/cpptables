@@ -21,6 +21,7 @@ enum class Side
 class CommandEntry : public TableEntry
 {
 private:
+
     FloatEntry output;
 
     bool _executed;
@@ -44,13 +45,14 @@ private:
     void readIndexes(MyString& str, Side side);
 
     bool isIndex(const MyString& str) const;
+
 public:
+
     CommandEntry(const MyString& inputValue);
     double getNumberValue() const override;
     unsigned int getNumberWidth() const override;
     unsigned int getDecimalPlaces() const;
     EntryType getType() const override;
-
 
     void execute(double result);
     bool hasExecuted() const;
@@ -71,4 +73,5 @@ public:
     Operation getOperation() const;
 
     TableEntry* clone() const override;
+
 };

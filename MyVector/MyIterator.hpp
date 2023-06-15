@@ -4,9 +4,11 @@ template<typename T>
 class MyIterator //used for range-based for loop with MyVector
 {
 private:
+
     T* _ptr;
 
 public:
+
     MyIterator(T* ptr);
 
     T& operator*();
@@ -21,6 +23,7 @@ public:
 
     bool operator==(const MyIterator<T>& other) const;
     bool operator!=(const MyIterator<T>& other) const;
+
 };
 
 template<typename T>

@@ -5,6 +5,7 @@
 class MyString
 {
 private:
+
     char* _data;
     size_t _size;
     size_t _capacity;
@@ -66,6 +67,7 @@ public:
     bool getline(std::istream& is);
 
     friend std::istream& operator>>(std::istream& is, MyString& str);
+
 };
 
 std::ostream& operator<<(std::ostream& os, const MyString& str);

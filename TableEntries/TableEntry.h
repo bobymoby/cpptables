@@ -14,10 +14,11 @@ enum class EntryType
 class TableEntry
 {
 protected:
+
     MyString inputValue;
 
-
 public:
+
     TableEntry(const MyString& inputValue);
     TableEntry() = default;
 
@@ -31,4 +32,5 @@ public:
     virtual TableEntry* clone() const = 0;
 
     virtual ~TableEntry() = default;
+
 };

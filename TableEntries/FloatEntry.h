@@ -5,8 +5,11 @@
 class FloatEntry : public TableEntry
 {
 private:
+
     unsigned int decimalPlaces;
+
 public:
+
     FloatEntry() = default;
     FloatEntry(const MyString& inputValue);
     double getNumberValue() const override;
@@ -15,4 +18,5 @@ public:
     EntryType getType() const override;
 
     TableEntry* clone() const override;
+
 };

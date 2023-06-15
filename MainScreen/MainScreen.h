@@ -5,6 +5,7 @@
 class MainScreen
 {
 private:
+
     Table _table;
     bool usingDynamicTable;
 
@@ -12,7 +13,9 @@ private:
     void resetTable();
 
 public:
+
     MainScreen();
 
     void run();
+
 };

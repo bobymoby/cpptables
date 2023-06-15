@@ -8,6 +8,7 @@
 class TableCol
 {
 private:
+
     MyVector<SharedPtr<TableEntry>> cells;
     unsigned int outputWidth;
     unsigned int numberWidth;
@@ -24,4 +25,5 @@ public:
     unsigned int getOutputWidth() const;
     unsigned int getNumberWidth() const;
     void updateWidth();
+
 };

@@ -7,6 +7,7 @@ template <typename T>
 class MyVector
 {
 private:
+
     T* _data;
     size_t _size;
     size_t _capacity;
@@ -47,6 +48,7 @@ public:
     const MyIterator<T> end() const;
     const MyIterator<T> cbegin() const;
     const MyIterator<T> cend() const;
+
 };
 
 template<typename T>

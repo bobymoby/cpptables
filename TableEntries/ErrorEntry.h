@@ -5,8 +5,11 @@
 class ErrorEntry : public TableEntry
 {
 private:
+
     MyString errorMsg;
+
 public:
+
     ErrorEntry(const MyString& inputValue, const MyString& errorMsg);
 
     const MyString& getErrorMsg() const;
@@ -16,4 +19,5 @@ public:
     unsigned int getNumberWidth() const override;
 
     TableEntry* clone() const override;
+
 };

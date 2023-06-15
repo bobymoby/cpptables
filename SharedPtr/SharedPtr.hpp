@@ -4,6 +4,7 @@ template<typename T>
 class SharedPtr
 {
 private:
+
     T* _ptr;
     size_t* _count;
 
@@ -12,6 +13,7 @@ private:
     void moveFrom(SharedPtr<T>&& other);
 
 public:
+
     SharedPtr();
     SharedPtr(const SharedPtr<T>& other);
     SharedPtr(SharedPtr<T>&& other) noexcept;
