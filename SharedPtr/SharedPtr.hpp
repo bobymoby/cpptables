@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstddef> // size_t
+#include <utility> // std::move
+
 template<typename T>
 class SharedPtr
 {
