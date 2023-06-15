@@ -1,7 +1,7 @@
 #pragma once
 
 template<typename T>
-class MyIterator
+class MyIterator //used for range-based for loop with MyVector
 {
 private:
     T* _ptr;

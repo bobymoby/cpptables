@@ -1,5 +1,5 @@
 #include "FloatEntry.h"
-#include "../Utils.hpp"
+#include "../Utils/Utils.hpp"
 
 FloatEntry::FloatEntry(const MyString& inputValue) : TableEntry(inputValue)
 {

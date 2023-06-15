@@ -2,8 +2,8 @@
 
 #include <fstream>
 
-#include "MyString/MyString.h"
-#include "MyVector/MyVector.hpp"
+#include "../MyString/MyString.h"
+#include "../MyVector/MyVector.hpp"
 
 namespace Utils
 {

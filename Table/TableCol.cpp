@@ -10,7 +10,7 @@ void TableCol::updateWidth()
 {
     outputWidth = 0;
     numberWidth = 0;
-    for (const TableEntry* cell : cells)
+    for (auto cell : cells)
     {
         if (cell->getOutputWidth() > outputWidth)
         {
@@ -23,99 +23,32 @@ void TableCol::updateWidth()
     }
 }
 
-void TableCol::copyFrom(const TableCol& other)
-{
-    outputWidth = other.outputWidth;
-    numberWidth = other.numberWidth;
-    for (const TableEntry* cell : other.cells)
-    {
-        cells.push_back(cell->clone());
-    }
-}
-
-void TableCol::moveFrom(TableCol&& other)
-{
-    outputWidth = other.outputWidth;
-    numberWidth = other.numberWidth;
-    cells = std::move(other.cells);
-}
-
-void TableCol::free()
-{
-    for (const TableEntry* cell : cells)
-    {
-        delete cell;
-    }
-}
-
-TableCol::TableCol(const MyVector<TableEntry*>& cells) : cells(cells)
+TableCol::TableCol(const MyVector<SharedPtr<TableEntry>>& cells) : cells(cells)
 {
     updateWidth();
 }
 
 TableCol::TableCol(size_t size)
 {
-    cells.fill(size, nullptr);
+    cells.fill(size, SharedPtr<TableEntry>(nullptr));
     for (size_t i = 0; i < size; i++)
     {
-        cells[i] = new TypeNullEntry();
+        cells[i] = SharedPtr<TableEntry>(new TypeNullEntry());
     }
 }
 
-TableCol::~TableCol()
-{
-    free();
-}
-
-TableCol::TableCol()
-{
-    outputWidth = 0;
-    numberWidth = 0;
-}
-
-TableCol::TableCol(const TableCol& other)
-{
-    copyFrom(other);
-}
-
-TableCol::TableCol(TableCol&& other) noexcept
-{
-    moveFrom(std::move(other));
-}
-
-TableCol& TableCol::operator=(const TableCol& other)
-{
-    if (this != &other)
-    {
-        free();
-        copyFrom(other);
-    }
-    return *this;
-}
-
-TableCol& TableCol::operator=(TableCol&& other) noexcept
-{
-    if (this != &other)
-    {
-        free();
-        moveFrom(std::move(other));
-    }
-    return *this;
-}
-
-const MyVector<TableEntry*>& TableCol::getCells() const
+const MyVector<SharedPtr<TableEntry>>& TableCol::getCells() const
 {
     return cells;
 }
 
-void TableCol::setCell(size_t index, TableEntry* cell)
+void TableCol::setCell(size_t index, const SharedPtr<TableEntry>& cell)
 {
-    delete cells[index];
     cells[index] = cell;
     updateWidth();
 }
 
-void TableCol::addCell(TableEntry* cell)
+void TableCol::addCell(const SharedPtr<TableEntry>& cell)
 {
     cells.push_back(cell);
     if (cell->getOutputWidth() > outputWidth)

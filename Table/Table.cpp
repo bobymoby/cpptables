@@ -3,67 +3,40 @@
 #include "../TableEntries/ErrorEntry.h"
 #include "../TableEntries/FloatEntry.h"
 #include "../TableEntries/TypeNullEntry.h"
-#include "../Utils.hpp"
+#include "../Utils/Utils.hpp"
 
 #include <iostream>
 #include <cmath> // real number powers
 
-void Table::copyFrom(const Table& other)
-{
-    for (const TableCol* col : other.cols)
-    {
-        cols.push_back(new TableCol(*col));
-    }
-    visited = MyVector<const TableEntry*>();
-    filename = other.filename;
-}
-
-void Table::moveFrom(Table&& other)
-{
-    cols = std::move(other.cols);
-    visited = std::move(other.visited);
-    filename = std::move(other.filename);
-}
-
-void Table::free()
-{
-    for (const TableCol* col : cols)
-    {
-        delete col;
-    }
-}
-
-void Table::addEntry(const MyString& entry, size_t colIndex, size_t rowIndex, size_t lineCount)
+void Table::addEntry(const MyString& entryStr, size_t colIndex, size_t rowIndex, size_t lineCount)
 {
     while (colIndex >= cols.size())
     {
-        cols.push_back(new TableCol(lineCount));
+        SharedPtr<TableCol> newCol(new TableCol(lineCount));
+        cols.push_back(newCol);
     }
-    cols[colIndex]->setCell(rowIndex, TableEntryFactory::createEntry(entry));
+    SharedPtr<TableEntry> newEntry(TableEntryFactory::createEntry(entryStr));
+    cols[colIndex]->setCell(rowIndex, newEntry);
 }
 
 void Table::executeAll()
 {
     //reset errors
     visited.clear();
-    TableEntry* currEntry;
-    TableEntry* newEntry;
-    const ErrorEntry* error;
-    CommandEntry* command;
     for (size_t colIndex = 0; colIndex < cols.size(); colIndex++)
     {
         for (size_t rowIndex = 0; rowIndex < cols[colIndex]->getCells().size(); rowIndex++)
         {
-            currEntry = cols[colIndex]->getCells()[rowIndex];
+            SharedPtr<TableEntry> currEntry = cols[colIndex]->getCells()[rowIndex];
             if (currEntry->getType() == EntryType::ERROR)
             {
-                error = (ErrorEntry*)currEntry;
-                newEntry = TableEntryFactory::createEntry(error->getInputValue());
+                const ErrorEntry* error = dynamic_cast<ErrorEntry*>(currEntry.get());
+                SharedPtr<TableEntry> newEntry(TableEntryFactory::createEntry(error->getInputValue()));
                 cols[colIndex]->setCell(rowIndex, newEntry);
             }
             else if (currEntry->getType() == EntryType::COMMAND)
             {
-                command = (CommandEntry*)currEntry;
+                CommandEntry* command = dynamic_cast<CommandEntry*>(currEntry.get());
                 command->reset();
             }
 
@@ -81,7 +54,7 @@ void Table::executeAll()
         }
     }
 
-    for (TableCol* col : cols)
+    for (auto col : cols)
     {
         col->updateWidth();
     }
@@ -91,21 +64,20 @@ void Table::executeAll()
 
 void Table::execute(size_t colIndex, size_t rowIndex)
 {
-    TableEntry* currEntry = cols[colIndex]->getCells()[rowIndex];
-    CommandEntry* command = (CommandEntry*)currEntry;
+    SharedPtr<TableEntry> currEntry = cols[colIndex]->getCells()[rowIndex];
+    CommandEntry* command = dynamic_cast<CommandEntry*>(currEntry.get());
 
     if (command->hasExecuted())
     {
         return;
     }
 
-    if (Utils::contains(visited, (const TableEntry*)currEntry))
+    if (Utils::contains(visited, currEntry))
     {
         makeCellError(colIndex, rowIndex, "Circular reference");
         return;
     }
-
-    visited.push_back(cols[colIndex]->getCells()[rowIndex]);
+    visited.push_back(currEntry);
 
     double result = 0;
     double lvalue = 0;
@@ -171,12 +143,13 @@ void Table::execute(size_t colIndex, size_t rowIndex)
 
 void Table::makeCellError(size_t colIndex, size_t rowIndex, const MyString& errorMsg)
 {
-    TableEntry* currEntry = cols[colIndex]->getCells()[rowIndex];
+    SharedPtr<TableEntry> currEntry = cols[colIndex]->getCells()[rowIndex];
     if (currEntry->getType() == EntryType::ERROR)
     {
         return;
     }
-    cols[colIndex]->setCell(rowIndex, new ErrorEntry(currEntry->getInputValue(), errorMsg));
+    SharedPtr<TableEntry> errorEntry(new ErrorEntry(currEntry->getInputValue(), errorMsg));
+    cols[colIndex]->setCell(rowIndex, errorEntry);
 }
 
 void Table::printErrors() const
@@ -187,7 +160,7 @@ void Table::printErrors() const
         {
             if (cols[colIndex]->getCells()[rowIndex]->getType() == EntryType::ERROR)
             {
-                ErrorEntry* error = (ErrorEntry*)(cols[colIndex]->getCells()[rowIndex]);
+                const ErrorEntry* error = dynamic_cast<ErrorEntry*>(cols[colIndex]->getCells()[rowIndex].get());
                 std::cout << 'R' << rowIndex << 'C' << colIndex << ": " << error->getErrorMsg() << std::endl;
             }
         }
@@ -250,7 +223,7 @@ bool Table::parseCommandArg(size_t cColIndex, size_t cRowIndex, size_t colIndex,
     }
     if (cols[colIndex]->getCells()[rowIndex]->getType() == EntryType::ERROR)
     {
-        ErrorEntry* err = (ErrorEntry*)(cols[colIndex]->getCells()[rowIndex]);
+        const ErrorEntry* err = dynamic_cast<ErrorEntry*>(cols[colIndex]->getCells()[rowIndex].get());
         MyString errorMsg = err->getErrorMsg() + " in R" + MyString::fromInt(rowIndex) + "C" + MyString::fromInt(colIndex);
         makeCellError(cColIndex, cRowIndex, errorMsg);
         return false;
@@ -278,41 +251,6 @@ Table::Table(std::ifstream& in)
     executeAll();
 }
 
-Table::Table(const Table& other)
-{
-    copyFrom(other);
-}
-
-Table::Table(Table&& other) noexcept
-{
-    moveFrom(std::move(other));
-}
-
-Table& Table::operator=(const Table& other)
-{
-    if (this != &other)
-    {
-        free();
-        copyFrom(other);
-    }
-    return *this;
-}
-
-Table& Table::operator=(Table&& other) noexcept
-{
-    if (this != &other)
-    {
-        free();
-        moveFrom(std::move(other));
-    }
-    return *this;
-}
-
-Table::~Table()
-{
-    free();
-}
-
 void Table::read(const MyString& filename)
 {
     std::ifstream file(filename.c_str());
@@ -325,8 +263,6 @@ void Table::read(const MyString& filename)
 void Table::read(std::ifstream& in)
 {
     this->filename = in.getloc().name().c_str();
-
-    free();
 
     readInput(in);
     executeAll();
@@ -359,7 +295,7 @@ void Table::save(std::ofstream& out) const
     {
         return;
     }
-    TableEntry* entry;
+    SharedPtr<TableEntry> entry;
     for (size_t rowIndex = 0; rowIndex < cols[0]->getCells().size(); rowIndex++)
     {
         for (size_t colIndex = 0; colIndex < cols.size(); colIndex++)
@@ -412,7 +348,7 @@ void Table::printInput() const
     for (size_t i = 0; i < cols[0]->getCells().size(); i++)
     {
         std::cout << "| ";
-        for (const TableCol* col : cols)
+        for (auto col : cols)
         {
             const MyString& output = col->getCells()[i]->getInputValue();
             std::cout << output << MyString(col->getOutputWidth() - output.size() + 1, ' ');
@@ -443,21 +379,24 @@ void Table::printNumberValues() const
         std::cout << '+';
     }
     std::cout << std::endl;
+    SharedPtr<TableEntry> entry;
+    double output;
     for (size_t i = 0; i < cols[0]->getCells().size(); i++)
     {
         std::cout << "| ";
-        for (const TableCol* col : cols)
+        for (auto col : cols)
         {
-            TableEntry* entry = col->getCells()[i];
-            double output = entry->getNumberValue();
+            entry = col->getCells()[i];
+            output = entry->getNumberValue();
             EntryType type = entry->getType();
             if (type == EntryType::FLOAT)
             {
-                Utils::setFloatPrecision(((FloatEntry*)entry)->getDecimalPlaces());
+                const FloatEntry* floatEntry = dynamic_cast<FloatEntry*>(entry.get());
+                Utils::setFloatPrecision(floatEntry->getDecimalPlaces());
             }
             else if (type == EntryType::COMMAND)
             {
-                const CommandEntry* command = (CommandEntry*)entry;
+                const CommandEntry* command = dynamic_cast<CommandEntry*>(entry.get());
                 if (command->hasExecuted())
                 {
                     Utils::setFloatPrecision(command->getDecimalPlaces());
@@ -540,7 +479,7 @@ void Table::setCell(size_t row, size_t col, const MyString& value)
     {
         throw std::out_of_range("Invalid row or column");
     }
-    TableEntry* cell = TableEntryFactory::createEntry(value);
+    SharedPtr<TableEntry> cell(TableEntryFactory::createEntry(value));
     cols[col]->setCell(row, cell);
 
     executeAll();
@@ -550,14 +489,15 @@ void Table::addCol()
 {
     if (cols.empty())
     {
-        cols.push_back(new TableCol(1));
-        cols[0]->setCell(0, new TypeNullEntry());
+        cols.push_back(SharedPtr<TableCol>(new TableCol(1)));
+        cols[0]->setCell(0, SharedPtr<TableEntry>(new TypeNullEntry()));
         return;
     }
-    cols.push_back(new TableCol(cols[0]->getCells().size()));
+    size_t size = cols[0]->getCells().size();
+    cols.push_back(SharedPtr<TableCol>(new TableCol(size)));
     for (size_t i = 0; i < cols[0]->getCells().size(); i++)
     {
-        cols.back()->addCell(new TypeNullEntry());
+        cols.back()->addCell(SharedPtr<TableEntry>(new TypeNullEntry()));
     }
 
 }
@@ -566,11 +506,11 @@ void Table::addRow()
 {
     if (cols.empty())
     {
-        cols.push_back(new TableCol(1));
+        cols.push_back(SharedPtr<TableCol>(new TableCol(1)));
     }
-    for (TableCol* col : cols)
+    for (auto col : cols)
     {
-        col->addCell(new TypeNullEntry());
+        col->addCell(SharedPtr<TableEntry>(new TypeNullEntry()));
     }
 }
 

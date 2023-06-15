@@ -1,21 +1,18 @@
 #pragma once
 
 #include <fstream>
+#include "../SharedPtr/SharedPtr.hpp"
 #include "TableCol.h"
 
 class Table
 {
 private:
-    MyVector<TableCol*> cols;
+    MyVector<SharedPtr<TableCol>> cols;
     MyString filename;
 
-    MyVector<const TableEntry*> visited; //used for detecting circular dependencies
+    MyVector<SharedPtr<TableEntry>> visited; //used for detecting circular dependencies
 
-    void free();
-    void copyFrom(const Table& other);
-    void moveFrom(Table&& other);
-
-    void addEntry(const MyString& entry, size_t colIndex, size_t rowIndex, size_t lineCount);
+    void addEntry(const MyString& entryStr, size_t colIndex, size_t rowIndex, size_t lineCount);
 
     void executeAll();
     void execute(size_t colIndex, size_t rowIndex);
@@ -31,11 +28,6 @@ public:
     Table() = default;
     Table(const MyString& filename);
     Table(std::ifstream& in);
-    Table(const Table& other);
-    Table(Table&& other) noexcept;
-    Table& operator=(const Table& other);
-    Table& operator=(Table&& other) noexcept;
-    ~Table();
 
     void read(const MyString& filename);
     void read(std::ifstream& in);

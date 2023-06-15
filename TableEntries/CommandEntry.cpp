@@ -1,5 +1,5 @@
 #include "CommandEntry.h"
-#include "../Utils.hpp"
+#include "../Utils/Utils.hpp"
 
 #include <iostream>
 
