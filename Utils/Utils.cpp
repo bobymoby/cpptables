@@ -371,5 +371,4 @@ void Utils::resetFloatPrecision()
 void Utils::setFloatPrecision(size_t precision)
 {
     std::cout << std::setprecision(precision);
-    std::cout << std::fixed;
 }

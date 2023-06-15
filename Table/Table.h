@@ -41,7 +41,7 @@ public:
     void save(std::ofstream& out) const;
 
     void printInput() const;
-    void printNumberValues() const;
+    void printOutput() const;
     void printTypes() const;
 
     void setCell(size_t row, size_t col, const MyString& value);

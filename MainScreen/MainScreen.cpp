@@ -80,7 +80,7 @@ void MainScreen::run()
             std::cout << "Input values:" << std::endl;
             _table.printInput();
             std::cout << "Output values:" << std::endl;
-            _table.printNumberValues();
+            _table.printOutput();
             std::cout << "Types:" << std::endl;
             _table.printTypes();
         }
@@ -104,7 +104,7 @@ void MainScreen::run()
             }
             std::cout << "Table: " << _table.getFilename() << std::endl;
             std::cout << "Output values:" << std::endl;
-            _table.printNumberValues();
+            _table.printOutput();
         }
         else if (Utils::strcmp(commandStr, "printTypes") == 0)
         {

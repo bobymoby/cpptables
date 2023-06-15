@@ -16,7 +16,9 @@ void Table::addEntry(const MyString& entryStr, size_t colIndex, size_t rowIndex,
         SharedPtr<TableCol> newCol(new TableCol(lineCount));
         cols.push_back(newCol);
     }
-    SharedPtr<TableEntry> newEntry(TableEntryFactory::createEntry(entryStr));
+    MyString stripped = entryStr;
+    Utils::strip(stripped, ' ');
+    SharedPtr<TableEntry> newEntry(TableEntryFactory::createEntry(stripped));
     cols[colIndex]->setCell(rowIndex, newEntry);
 }
 
@@ -371,13 +373,14 @@ void Table::printInput() const
     }
 }
 
-void Table::printNumberValues() const
+void Table::printOutput() const
 {
     if (cols.empty())
     {
         std::cout << "Empty table!" << std::endl;
         return;
     }
+    std::cout << std::fixed;
     std::cout << '+';
     for (size_t j = 0; j < cols.size(); j++)
     {
@@ -408,12 +411,13 @@ void Table::printNumberValues() const
                     Utils::setFloatPrecision(command->getDecimalPlaces());
                 }
             }
+            else
+            {
+                Utils::setFloatPrecision(0);
+            }
             std::cout << output;
             std::cout << MyString(col->getNumberWidth() - entry->getNumberWidth() + 1, ' ');
             std::cout << "| ";
-
-            Utils::resetFloatPrecision();
-
         }
         std::cout << std::endl;
         std::cout << '+';
@@ -424,6 +428,7 @@ void Table::printNumberValues() const
         }
         std::cout << std::endl;
     }
+    Utils::resetFloatPrecision();
 }
 
 void Table::printTypes() const
@@ -486,7 +491,9 @@ void Table::setCell(size_t row, size_t col, const MyString& value)
     {
         throw std::out_of_range("Invalid row or column");
     }
-    SharedPtr<TableEntry> cell(TableEntryFactory::createEntry(value));
+    MyString stripped = value;
+    Utils::strip(stripped, ' ');
+    SharedPtr<TableEntry> cell(TableEntryFactory::createEntry(stripped));
     cols[col - 1]->setCell(row - 1, cell);
 
     executeAll();
