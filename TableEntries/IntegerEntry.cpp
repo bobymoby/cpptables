@@ -8,7 +8,7 @@ IntegerEntry::IntegerEntry(const MyString& inputValue) : TableEntry(inputValue)
 
 double IntegerEntry::getNumberValue() const
 {
-    return Utils::stod(inputValue.c_str());
+    return Utils::stod(inputValue);
 }
 
 unsigned int IntegerEntry::getNumberWidth() const

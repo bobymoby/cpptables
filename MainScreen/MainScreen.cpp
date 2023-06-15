@@ -126,9 +126,9 @@ void MainScreen::run()
                 continue;
             }
             size_t row, col;
-            std::cout << "Enter row(starts from 0): ";
+            std::cout << "Enter row: ";
             std::cin >> row;
-            std::cout << "Enter col(starts from 0): ";
+            std::cout << "Enter col: ";
             std::cin >> col;
             MyString value;
             std::cout << "Enter value: ";

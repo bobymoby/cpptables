@@ -12,12 +12,21 @@ enum class Operation
     POWER
 };
 
+enum class Side
+{
+    LEFT,
+    RIGHT
+};
+
 class CommandEntry : public TableEntry
 {
 private:
     FloatEntry output;
 
-    bool executed;
+    bool _executed;
+
+    bool _shouldBeError;
+    MyString errorMsg;
 
     Operation op;
 
@@ -32,7 +41,9 @@ private:
     double rightNumberValue;
 
     void parseCommand();
-    void readIndexes(MyString& str, bool isLeft);
+    void readIndexes(MyString& str, Side side);
+
+    bool isIndex(const MyString& str) const;
 public:
     CommandEntry(const MyString& inputValue);
     double getNumberValue() const override;
@@ -45,6 +56,8 @@ public:
     bool hasExecuted() const;
     void reset();
 
+    const MyString& getErrorMsg() const;
+    bool shouldBeError() const;
 
     bool getIsLeftCell() const;
     size_t getLCIndex() const;

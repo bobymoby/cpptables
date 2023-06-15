@@ -5,6 +5,7 @@
 #include "../TableEntries/StringEntry.h"
 #include "../TableEntries/TypeNullEntry.h"
 #include "../TableEntries/ErrorEntry.h"
+#include "../Utils/Utils.hpp"
 
 #include <iostream>
 
@@ -14,40 +15,6 @@ bool TableEntryFactory::isString(const MyString& inputValue)
     return inputValue.front() == '"' && inputValue.back() == '"';
 }
 
-bool TableEntryFactory::isInteger(const MyString& inputValue)
-{
-    bool hasSign = inputValue.front() == '+' || inputValue.front() == '-';
-    for (int i = hasSign; i < inputValue.size(); i++)
-    {
-        if (!isdigit(inputValue[i]))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool TableEntryFactory::isFloat(const MyString& inputValue)
-{
-    bool hasSign = inputValue.front() == '+' || inputValue.front() == '-';
-    bool hasDot = false;
-    for (int i = hasSign; i < inputValue.size(); i++)
-    {
-        if (inputValue[i] == '.')
-        {
-            if (hasDot)
-            {
-                return false;
-            }
-            hasDot = true;
-        }
-        else if (!isdigit(inputValue[i]))
-        {
-            return false;
-        }
-    }
-    return true;
-}
 
 bool TableEntryFactory::isCommand(const MyString& inputValue)
 {
@@ -114,11 +81,11 @@ TableEntry* TableEntryFactory::createEntry(const MyString& inputValue)
 
         return new StringEntry(stripped);
     }
-    if (isInteger(inputValue))
+    if (Utils::isInt(inputValue))
     {
         return new IntegerEntry(inputValue);
     }
-    if (isFloat(inputValue))
+    if (Utils::isFloat(inputValue))
     {
         return new FloatEntry(inputValue);
     }

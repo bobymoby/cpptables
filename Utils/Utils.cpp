@@ -42,6 +42,46 @@ bool Utils::isInt(double number)
     return number == (int)number;
 }
 
+bool Utils::isDigit(char ch)
+{
+    return ch >= '0' && ch <= '9';
+}
+
+bool Utils::isInt(const MyString& str)
+{
+    bool hasSign = str.front() == '+' || str.front() == '-';
+    for (int i = hasSign; i < str.size(); i++)
+    {
+        if (!isDigit(str[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Utils::isFloat(const MyString& str)
+{
+    bool hasSign = str.front() == '+' || str.front() == '-';
+    bool hasDot = false;
+    for (int i = hasSign; i < str.size(); i++)
+    {
+        if (str[i] == '.')
+        {
+            if (hasDot)
+            {
+                return false;
+            }
+            hasDot = true;
+        }
+        else if (!isDigit(str[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 size_t Utils::numlen(long long number)
 {
     if (number == 0)
@@ -59,6 +99,36 @@ size_t Utils::numlen(long long number)
         length++;
     }
     return length;
+}
+
+MyString Utils::itoa(long long number)
+{
+    MyString result;
+    if (number == 0)
+    {
+        result += '0';
+        return result;
+    }
+    size_t index = 0;
+    bool isNegative = false;
+    if (number < 0)
+    {
+        result += '-';
+        number *= -1;
+        isNegative = true;
+    }
+    while (number > 0)
+    {
+        result += number % 10 + '0';
+        number /= 10;
+    }
+    if (isNegative)
+    {
+        result += '-';
+        index++;
+    }
+    reverse(result);
+    return result;
 }
 
 void Utils::itoa(long long number, char* buffer)
@@ -92,7 +162,7 @@ void Utils::itoa(long long number, char* buffer)
     reverse(buffer);
 }
 
-long long Utils::stoi(const char* str)
+long long Utils::stoi(const MyString& str)
 {
     long long result = 0;
     size_t index = 0;
@@ -115,8 +185,13 @@ long long Utils::stoi(const char* str)
     return result;
 }
 
-double Utils::stod(const char* str)
+double Utils::stod(const MyString& str)
 {
+    if (!isFloat(str))
+    {
+        MyString msg = str + " is not a valid float";
+        throw std::invalid_argument(msg.c_str());
+    }
     double result = 0;
     size_t index = 0;
     bool isNegative = false;
@@ -263,12 +338,24 @@ int Utils::strcmp(const char* str1, const char* str2)
     return 1;
 }
 
-void Utils::reverse(char* str)
+void Utils::reverse(MyString& str)
 {
-    size_t length = strlen(str);
+    size_t length = str.size();
     for (size_t i = 0; i < length / 2; i++)
     {
         char temp = str[i];
+        str[i] = str[length - i - 1];
+        str[length - i - 1] = temp;
+    }
+}
+
+void Utils::reverse(char* str)
+{
+    size_t length = strlen(str);
+    char temp;
+    for (size_t i = 0; i < length / 2; i++)
+    {
+        temp = str[i];
         str[i] = str[length - i - 1];
         str[length - i - 1] = temp;
     }

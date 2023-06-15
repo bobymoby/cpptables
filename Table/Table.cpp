@@ -71,6 +71,11 @@ void Table::execute(size_t colIndex, size_t rowIndex)
     {
         return;
     }
+    if (command->shouldBeError())
+    {
+        makeCellError(colIndex, rowIndex, command->getErrorMsg());
+        return;
+    }
 
     if (Utils::contains(visited, currEntry))
     {
@@ -161,7 +166,7 @@ void Table::printErrors() const
             if (cols[colIndex]->getCells()[rowIndex]->getType() == EntryType::ERROR)
             {
                 const ErrorEntry* error = dynamic_cast<ErrorEntry*>(cols[colIndex]->getCells()[rowIndex].get());
-                std::cout << 'R' << rowIndex << 'C' << colIndex << ": " << error->getErrorMsg() << std::endl;
+                std::cout << 'R' << rowIndex + 1 << 'C' << colIndex + 1 << ": " << error->getErrorMsg() << std::endl;
             }
         }
     }
@@ -224,7 +229,7 @@ bool Table::parseCommandArg(size_t cColIndex, size_t cRowIndex, size_t colIndex,
     if (cols[colIndex]->getCells()[rowIndex]->getType() == EntryType::ERROR)
     {
         const ErrorEntry* err = dynamic_cast<ErrorEntry*>(cols[colIndex]->getCells()[rowIndex].get());
-        MyString errorMsg = err->getErrorMsg() + " in R" + MyString::fromInt(rowIndex) + "C" + MyString::fromInt(colIndex);
+        MyString errorMsg = err->getErrorMsg() + " in R" + MyString::fromInt(rowIndex + 1) + "C" + MyString::fromInt(colIndex + 1);
         makeCellError(cColIndex, cRowIndex, errorMsg);
         return false;
     }
@@ -475,12 +480,13 @@ void Table::printTypes() const
 
 void Table::setCell(size_t row, size_t col, const MyString& value)
 {
-    if (row >= cols[0]->getCells().size() || col >= cols.size())
+    if (row >= cols[0]->getCells().size() + 1 || col >= cols.size() + 1
+        || row == 0 || col == 0)
     {
         throw std::out_of_range("Invalid row or column");
     }
     SharedPtr<TableEntry> cell(TableEntryFactory::createEntry(value));
-    cols[col]->setCell(row, cell);
+    cols[col - 1]->setCell(row - 1, cell);
 
     executeAll();
 }

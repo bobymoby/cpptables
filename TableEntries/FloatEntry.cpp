@@ -16,7 +16,7 @@ FloatEntry::FloatEntry(const MyString& inputValue) : TableEntry(inputValue)
 
 double FloatEntry::getNumberValue() const
 {
-    return Utils::stod(inputValue.c_str());
+    return Utils::stod(inputValue);
 }
 
 unsigned int FloatEntry::getNumberWidth() const

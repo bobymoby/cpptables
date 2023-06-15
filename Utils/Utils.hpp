@@ -11,11 +11,15 @@ namespace Utils
     size_t GetLineCount(std::ifstream& ifs);
 
     bool isInt(double number);
+    bool isDigit(char ch);
+    bool isInt(const MyString& str);
+    bool isFloat(const MyString& str);
 
     size_t numlen(long long number);
+    long long stoi(const MyString& str);
+    double stod(const MyString& str);
+    MyString itoa(long long number);
     void itoa(long long number, char* buffer);
-    long long stoi(const char* str);
-    double stod(const char* str);
     MyString dtoa(double number);
 
     void lstrip(MyString& str, char toBeRemoved);
@@ -28,6 +32,7 @@ namespace Utils
     size_t strlen(const char* str);
     int strcmp(const char* str1, const char* str2);
 
+    void reverse(MyString& str);
     void reverse(char* str);
 
     template <typename T>

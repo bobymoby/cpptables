@@ -5,20 +5,22 @@
 
 CommandEntry::CommandEntry(const MyString& inputValue) : TableEntry(inputValue)
 {
+    _shouldBeError = false;
+    errorMsg = "";
     reset();
     parseCommand();
 }
 
 void CommandEntry::execute(double result)
 {
-    executed = true;
+    _executed = true;
     MyString resultStr = Utils::dtoa(result);
     output = FloatEntry(resultStr);
 }
 
 double CommandEntry::getNumberValue() const
 {
-    if (executed)
+    if (_executed)
     {
         return output.getNumberValue();
     }
@@ -27,7 +29,7 @@ double CommandEntry::getNumberValue() const
 
 unsigned int CommandEntry::getNumberWidth() const
 {
-    if (executed)
+    if (_executed)
     {
         return output.getNumberWidth();
     }
@@ -36,7 +38,7 @@ unsigned int CommandEntry::getNumberWidth() const
 
 unsigned int CommandEntry::getDecimalPlaces() const
 {
-    if (executed)
+    if (_executed)
     {
         return output.getDecimalPlaces();
     }
@@ -82,7 +84,8 @@ void CommandEntry::parseCommand()
     }
     else
     {
-        std::cout << "Invalid command: " << inputStr << std::endl;
+        _shouldBeError = true;
+        errorMsg = MyString("Invalid command: ") + inputStr;
     }
     Utils::strip(lside, ' ');
     Utils::strip(rside, ' ');
@@ -90,36 +93,38 @@ void CommandEntry::parseCommand()
     if (lside[0] == 'R')
     {
         isLeftCell = true;
-        readIndexes(lside, true);
+        readIndexes(lside, Side::LEFT);
     }
     else
     {
         isLeftCell = false;
         try
         {
-            leftNumberValue = Utils::stod(lside.c_str());
+            leftNumberValue = Utils::stod(lside);
         }
         catch (const std::exception&)
         {
-            std::cout << "Invalid command argument: " << lside << std::endl;
+            _shouldBeError = true;
+            errorMsg = MyString("Invalid command argument: ") + lside;
         }
     }
 
     if (rside[0] == 'R')
     {
         isRightCell = true;
-        readIndexes(rside, false);
+        readIndexes(rside, Side::RIGHT);
     }
     else
     {
         isRightCell = false;
         try
         {
-            rightNumberValue = Utils::stod(rside.c_str());
+            rightNumberValue = Utils::stod(rside);
         }
         catch (const std::exception&)
         {
-            std::cout << "Invalid command argument: " << rside << std::endl;
+            _shouldBeError = true;
+            errorMsg = MyString("Invalid command argument: ") + rside;
         }
     }
 }
@@ -176,36 +181,73 @@ size_t CommandEntry::getRRIndex() const
 
 bool CommandEntry::hasExecuted() const
 {
-    return executed;
+    return _executed;
 }
 
 void CommandEntry::reset()
 {
-    executed = false;
+    _executed = false;
     output = FloatEntry();
 }
 
-void CommandEntry::readIndexes(MyString& str, bool isLeft)
+const MyString& CommandEntry::getErrorMsg() const
+{
+    return errorMsg;
+}
+
+bool CommandEntry::shouldBeError() const
+{
+    return _shouldBeError;
+}
+
+void CommandEntry::readIndexes(MyString& str, Side side)
 {
     Utils::strip(str, ' ');
     size_t startIndex = 1;
     size_t index = 1;
-    while (index < str.size() && isdigit(str[index]))
+    while (index < str.size() && Utils::isDigit(str[index]))
     {
         index++;
     }
-    size_t rowIndex = Utils::stoi(str.substr(startIndex, index - startIndex).c_str());
-    index++;
-    size_t colIndex = Utils::stoi(str.substr(index).c_str());
 
-    if (isLeft)
+    MyString rowIndexStr = str.substr(startIndex, index - startIndex);
+    if (!isIndex(rowIndexStr))
     {
-        leftColIndex = colIndex;
-        leftRowIndex = rowIndex;
+        _shouldBeError = true;
+        errorMsg = MyString("Invalid row index: ") + rowIndexStr;
+        return;
+    }
+    size_t rowIndex = Utils::stoi(rowIndexStr.c_str());
+
+    MyString colIndexStr = str.substr(index + 1);
+    if (!isIndex(colIndexStr))
+    {
+        _shouldBeError = true;
+        errorMsg = MyString("Invalid column index: ") + colIndexStr;
+        return;
+    }
+    size_t colIndex = Utils::stoi(colIndexStr.c_str());
+
+    if (side == Side::LEFT)
+    {
+        leftColIndex = colIndex - 1;
+        leftRowIndex = rowIndex - 1;
     }
     else
     {
-        rightColIndex = colIndex;
-        rightRowIndex = rowIndex;
+        rightColIndex = colIndex - 1;
+        rightRowIndex = rowIndex - 1;
     }
+}
+
+bool CommandEntry::isIndex(const MyString& str) const
+{
+    for (size_t i = 0; i < str.size(); i++)
+    {
+        if (!Utils::isDigit(str[i]))
+        {
+            return false;
+        }
+    }
+    return true;
 }

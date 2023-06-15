@@ -6,8 +6,6 @@ class TableEntryFactory
 {
 private:
     static bool isString(const MyString& inputValue);
-    static bool isInteger(const MyString& inputValue);
-    static bool isFloat(const MyString& inputValue);
     static bool isCommand(const MyString& inputValue);
     static bool isFalseCommand(const MyString& inputValue);
     static bool isTypeNull(const MyString& inputValue);
