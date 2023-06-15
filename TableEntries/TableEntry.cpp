@@ -1,5 +1,6 @@
 #include "TableEntry.h"
 
+
 TableEntry::TableEntry(const MyString& inputValue)
 {
     this->inputValue = inputValue;

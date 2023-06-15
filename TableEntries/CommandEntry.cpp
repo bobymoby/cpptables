@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+
 CommandEntry::CommandEntry(const MyString& inputValue) : TableEntry(inputValue)
 {
     _shouldBeError = false;

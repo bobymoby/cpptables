@@ -2,6 +2,7 @@
 
 #include "TableEntry.h"
 
+
 class ErrorEntry : public TableEntry
 {
 private:

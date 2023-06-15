@@ -2,6 +2,7 @@
 
 #include "TableEntry.h"
 
+
 class FloatEntry : public TableEntry
 {
 private:

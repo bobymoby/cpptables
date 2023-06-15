@@ -1,5 +1,6 @@
 #include "TypeNullEntry.h"
 
+
 TypeNullEntry::TypeNullEntry() : TableEntry("")
 {
 }

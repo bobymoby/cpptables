@@ -1,5 +1,7 @@
 #pragma once
+
 #include "../MyString/MyString.h"
+
 
 enum class EntryType
 {

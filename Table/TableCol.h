@@ -5,6 +5,7 @@
 #include "../MyVector/MyVector.hpp"
 #include "../SharedPtr/SharedPtr.hpp"
 
+
 class TableCol
 {
 private:

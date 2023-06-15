@@ -1,5 +1,6 @@
 #include "ErrorEntry.h"
 
+
 ErrorEntry::ErrorEntry(const MyString& value, const MyString& errorMsg) : TableEntry(value)
 {
     this->errorMsg = errorMsg;

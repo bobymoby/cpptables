@@ -1,8 +1,10 @@
 #pragma once
 
-#include <fstream>
 #include "../SharedPtr/SharedPtr.hpp"
 #include "TableCol.h"
+
+#include <fstream>
+
 
 class Table
 {

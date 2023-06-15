@@ -2,6 +2,7 @@
 
 #include "TableEntry.h"
 
+
 class StringEntry : public TableEntry
 {
 public:

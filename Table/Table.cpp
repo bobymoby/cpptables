@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cmath> // real number powers
 
+
 void Table::addEntry(const MyString& entryStr, size_t colIndex, size_t rowIndex, size_t lineCount)
 {
     while (colIndex >= cols.size())

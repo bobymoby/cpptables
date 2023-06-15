@@ -2,6 +2,7 @@
 
 #include "../TableEntries/TableEntry.h"
 
+
 class TableEntryFactory
 {
 private:

@@ -2,7 +2,6 @@
 #include "../Utils/Utils.hpp"
 
 
-
 bool MainScreen::isTableOpen() const
 {
     return usingDynamicTable || _table.getFilename().size() > 0;

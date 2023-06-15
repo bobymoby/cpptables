@@ -5,7 +5,6 @@
 #include <iostream>
 
 
-
 void TableCol::updateWidth()
 {
     outputWidth = 0;

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iomanip> // std::setprecision std::fixed std::defaultfloat
 
+
 size_t Utils::GetCharCount(std::ifstream& ifs, char ch)
 {
     size_t currentPosition = ifs.tellg();

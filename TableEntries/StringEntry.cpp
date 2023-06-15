@@ -1,5 +1,6 @@
 #include "StringEntry.h"
 
+
 StringEntry::StringEntry(const MyString& inputValue) : TableEntry(inputValue)
 {
 }
